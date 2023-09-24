@@ -679,7 +679,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 59e22ac4cf5414593b027619ea078f4e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1cc8c7aa7decb4d8cab51a186713a299, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -998,31 +998,73 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfe74733c7b6452c9df3698a8da98d76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputAction:
-    m_Name: Input
-    m_Type: 1
-    m_ExpectedControlType: Button
-    m_Id: abbd7148-10b0-4e26-b1f4-e1e6ac6a4a75
-    m_Processors: 
-    m_Interactions: Hold
-    m_SingletonActionBindings:
-    - m_Name: 
-      m_Id: e5aa2620-a646-444e-9f96-3617d8b50cc9
-      m_Path: <Keyboard>/space
-      m_Interactions: 
+  inputActionData:
+    decide:
+      m_Name: Decide
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: 736e79ee-ce4d-4f1b-8cc2-e64c9467bb67
       m_Processors: 
-      m_Groups: 
-      m_Action: Input
-      m_Flags: 0
-    - m_Name: 
-      m_Id: aa3f5f89-4489-442a-a728-8e4b1908f089
-      m_Path: <Mouse>/leftButton
       m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Input
+      m_SingletonActionBindings:
+      - m_Name: 
+        m_Id: ea298644-a758-43b5-a2cb-050307bbc1bf
+        m_Path: <Keyboard>/space
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Decide
+        m_Flags: 0
+      - m_Name: 
+        m_Id: 848b2487-58b9-4ae3-9e98-1b7cabf40baf
+        m_Path: <Mouse>/leftButton
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Decide
+        m_Flags: 0
+      - m_Name: 
+        m_Id: 5f3aaefb-f64a-4ef3-b8c9-a46dfcbbfa10
+        m_Path: <Gamepad>/buttonSouth
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Decide
+        m_Flags: 0
       m_Flags: 0
-    m_Flags: 0
+    retry:
+      m_Name: Retry
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: c8a25099-29f3-4649-a529-cb3d26585464
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings:
+      - m_Name: 
+        m_Id: fd3945d2-8427-4807-b8cf-7b8ec4baa744
+        m_Path: <Keyboard>/r
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Retry
+        m_Flags: 0
+      - m_Name: 
+        m_Id: 8ded7e0c-92e8-48fd-b68e-e53bb3610f29
+        m_Path: <Mouse>/rightButton
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Retry
+        m_Flags: 0
+      - m_Name: 
+        m_Id: d848efaa-b1ab-4596-9eb2-864847d282b2
+        m_Path: <Gamepad>/start
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Retry
+        m_Flags: 0
+      m_Flags: 0
   player: {fileID: 551497658}
 --- !u!4 &1215011762
 Transform:
