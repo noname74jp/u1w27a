@@ -4,19 +4,20 @@ using UnityEngine;
 namespace Game.UnityGameObject.Char
 {
     /// <summary>
-    /// プレイヤーのオブジェクト。
+    /// 弾のオブジェクト。
     /// </summary>
-    public class Player : MonoBehaviour
+    public class Bullet : MonoBehaviour
     {
-        #region methods
+        #region variables
 
         /// <summary>
-        /// 初期化する。
+        /// 対象の<see cref="SpriteRenderer" />
         /// </summary>
-        public void Initialize()
-        {
-            transform.position = Vector3.zero;
-        }
+        [SerializeField] private SpriteRenderer spriteRenderer;
+
+        #endregion
+
+        #region methods
 
         /// <summary>
         /// 状態を更新する。
@@ -24,6 +25,7 @@ namespace Game.UnityGameObject.Char
         /// <param name="logic">更新に使用するロジック。</param>
         public void UpdateStatus(LogicBase logic)
         {
+            spriteRenderer.enabled = logic.Alive;
             transform.position = logic.Location;
         }
 

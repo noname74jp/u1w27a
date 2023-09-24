@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Game.Logic;
@@ -91,9 +92,19 @@ namespace Game.UnityGameObject
         [SerializeField] private Player player;
 
         /// <summary>
+        /// プレイヤーのオブジェクト。
+        /// </summary>
+        [SerializeField] private Bullet[] playerBullets;
+
+        /// <summary>
         /// プレイヤーのロジック。
         /// </summary>
         private PlayerLogic _playerLogic;
+
+        /// <summary>
+        /// プレイヤー弾のロジック。
+        /// </summary>
+        private List<BulletLogic> _playerBulletLogics;
 
         /// <summary>
         /// タイマー。
@@ -174,7 +185,14 @@ namespace Game.UnityGameObject
         {
             _timer = 0.0;
             _playerLogic = new PlayerLogic();
-            _playerLogic.Initialize();
+            _playerLogic.Create();
+            _playerBulletLogics = new List<BulletLogic>();
+            for (var i = 0; i < playerBullets.Length; i++)
+            {
+                BulletLogic playerBulletLogic = new();
+                _playerBulletLogics.Add(playerBulletLogic);
+            }
+
             player.UpdateStatus(_playerLogic);
         }
 
@@ -203,7 +221,6 @@ namespace Game.UnityGameObject
 
                 // 次のフレームへ
                 await UniTask.NextFrame(token);
-//                token.ThrowIfCancellationRequested();
             }
 
             // タイトル終了処理
@@ -237,15 +254,19 @@ namespace Game.UnityGameObject
                 while (_timer >= Defines.SecondsPerFrame)
                 {
                     _timer -= Defines.SecondsPerFrame;
-                    _playerLogic.UpdateStatus(isDecideKeyPressed);
+                    _playerLogic.UpdateStatus(isDecideKeyPressed, _playerBulletLogics);
+                    _playerBulletLogics.ForEach(logic => logic.UpdateStatus());
                 }
 
                 // Unity上の更新
                 player.UpdateStatus(_playerLogic);
+                for (var i = 0; i < playerBullets.Length; i++)
+                {
+                    playerBullets[i].UpdateStatus(_playerBulletLogics[i]);
+                }
 
                 // 次のフレームへ
                 await UniTask.NextFrame(token);
-//                token.ThrowIfCancellationRequested();
             }
         }
 

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Game.Logic
@@ -5,17 +7,8 @@ namespace Game.Logic
     /// <summary>
     /// プレイヤーのロジック。
     /// </summary>
-    public class PlayerLogic
+    public class PlayerLogic : LogicBase
     {
-        #region properties
-
-        /// <summary>
-        /// 位置。
-        /// </summary>
-        public Vector2 Location => _location;
-
-        #endregion
-
         #region constants
 
         /// <summary>
@@ -58,19 +51,14 @@ namespace Game.Logic
         /// </summary>
         private static readonly Rect LocationRect = new(-432.0f + PlayerSize * 0.5f, -222.0f + PlayerSize * 0.5f, 864.0f - PlayerSize, 444.0f - PlayerSize);
 
+        /// <summary>
+        /// 攻撃のインターバル。
+        /// </summary>
+        private const int AttackInterval = 4;
+
         #endregion
 
         #region variables
-
-        /// <summary>
-        /// 位置。
-        /// </summary>
-        private Vector2 _location;
-
-        /// <summary>
-        /// 速度。
-        /// </summary>
-        private Vector2 _velocity;
 
         /// <summary>
         /// 垂直方向の加速度。
@@ -87,34 +75,39 @@ namespace Game.Logic
         /// </summary>
         private bool _wasKeyPressed;
 
+        /// <summary>
+        /// 残り攻撃インターバル。
+        /// </summary>
+        private int _remainAttackInterval;
+
         #endregion
 
         #region methods
 
         /// <summary>
-        /// 初期化する。
+        /// 生成する。
         /// </summary>
-        public void Initialize()
+        public void Create()
         {
-            _location = Vector2.zero;
-            _velocity = Vector2.zero;
+            base.Create(Vector2.zero, Vector2.zero, PlayerSize);
             _verticalAcceleration = VerticalAccelerationOnDescent;
             _flipped = false;
             _wasKeyPressed = false;
+            _remainAttackInterval = AttackInterval;
         }
 
         /// <summary>
         /// 更新する。
         /// </summary>
         /// <param name="isKeyPressed">キーが押されていればtrue。</param>
-        public void UpdateStatus(bool isKeyPressed)
+        /// <param name="playerBulletLogics">弾配列。</param>
+        public void UpdateStatus(bool isKeyPressed, List<BulletLogic> playerBulletLogics)
         {
             // ジャンプ
             if (isKeyPressed && !_wasKeyPressed)
             {
                 _flipped = !_flipped;
-                _velocity.x = _flipped ? -HorizontalInitialVelocity : HorizontalInitialVelocity;
-                _velocity.y = VerticalInitialVelocity;
+                _velocity = new Vector2(_flipped ? -HorizontalInitialVelocity : HorizontalInitialVelocity, VerticalInitialVelocity);
                 _verticalAcceleration = VerticalAccelerationOnAscent;
             }
 
@@ -154,6 +147,33 @@ namespace Game.Logic
             // 加速度を更新
             // ボタンを離している、もしくは下降しているときは加速度が大きくなる
             _verticalAcceleration = isKeyPressed && _velocity.y >= 0.0f ? VerticalAccelerationOnAscent : VerticalAccelerationOnDescent;
+
+            // 弾を撃つ
+            Shoot(playerBulletLogics);
+        }
+
+        /// <summary>
+        /// 弾を撃つ
+        /// </summary>
+        /// <param name="playerBulletLogics">弾配列。</param>
+        private void Shoot(List<BulletLogic> playerBulletLogics)
+        {
+            _remainAttackInterval--;
+            if (_remainAttackInterval > 0)
+            {
+                return;
+            }
+
+            _remainAttackInterval = AttackInterval;
+            var bulletLogic = playerBulletLogics.FirstOrDefault(logic => !logic.Alive);
+            if (bulletLogic == null)
+            {
+                return;
+            }
+
+            Vector2 bulletVelocity = new((_flipped ? -480.0f : 480.0f) * (float)Defines.SecondsPerFrame, 0.0f);
+            var bulletSize = 8.0f;
+            bulletLogic.Create(_location, bulletVelocity, bulletSize);
         }
 
         #endregion
