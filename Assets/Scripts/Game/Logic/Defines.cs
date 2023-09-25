@@ -10,12 +10,12 @@ namespace Game.Logic
         #region constants
 
         /// <summary>
-        /// フレームレート[frame]。
+        /// フレームレート[frame/s]。
         /// </summary>
-        public const double FramePerSec = 60.0;
+        public const double FramePerSec = 240.0;
 
         /// <summary>
-        /// 1フレームあたりの時間[s]。
+        /// 1フレームあたりの時間[s/frame]。
         /// </summary>
         public const double SecondsPerFrame = 1.0 / FramePerSec;
 
