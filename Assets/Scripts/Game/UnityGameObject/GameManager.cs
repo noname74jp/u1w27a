@@ -14,6 +14,12 @@ namespace Game.UnityGameObject
     /// </summary>
     public class GameManager : MonoBehaviour
     {
+        #region constants
+
+        private const int BulletCount = 32;
+
+        #endregion
+
         #region classes
 
         /// <summary>
@@ -92,9 +98,9 @@ namespace Game.UnityGameObject
         [SerializeField] private Player player;
 
         /// <summary>
-        /// プレイヤーのオブジェクト。
+        /// プレイヤーの弾丸管理。
         /// </summary>
-        [SerializeField] private Bullet[] playerBullets;
+        [SerializeField] private BulletCoordinator playerBulletCoordinator;
 
         /// <summary>
         /// プレイヤーのロジック。
@@ -125,6 +131,7 @@ namespace Game.UnityGameObject
         /// </summary>
         private void Awake()
         {
+            playerBulletCoordinator.Initialize(BulletCount);
             StartGameLoop();
         }
 
@@ -187,7 +194,7 @@ namespace Game.UnityGameObject
             _playerLogic = new PlayerLogic();
             _playerLogic.Create();
             _playerBulletLogics = new List<BulletLogic>();
-            for (var i = 0; i < playerBullets.Length; i++)
+            for (var i = 0; i < playerBulletCoordinator.Bullets.Count; i++)
             {
                 BulletLogic playerBulletLogic = new();
                 _playerBulletLogics.Add(playerBulletLogic);
@@ -210,9 +217,6 @@ namespace Game.UnityGameObject
             // メインループ
             while (true)
             {
-                // 入力管理
-                var isDecideKeyPressed = inputActionData.IsDecideKeyPressed();
-
                 // ゲーム開始
                 if (inputActionData.IsDecideKeyPressed())
                 {
@@ -260,9 +264,9 @@ namespace Game.UnityGameObject
 
                 // Unity上の更新
                 player.UpdateStatus(_playerLogic);
-                for (var i = 0; i < playerBullets.Length; i++)
+                for (var i = 0; i < playerBulletCoordinator.Bullets.Count; i++)
                 {
-                    playerBullets[i].UpdateStatus(_playerBulletLogics[i]);
+                    playerBulletCoordinator.Bullets[i].UpdateStatus(_playerBulletLogics[i]);
                 }
 
                 // 次のフレームへ
