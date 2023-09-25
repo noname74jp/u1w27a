@@ -19,12 +19,12 @@ namespace Game.Logic
         /// <summary>
         /// 上昇時の垂直方向の加速度[pixel/frame]。
         /// </summary>
-        private const float VerticalAccelerationOnAscent = -15.0f * (float)Defines.SecondsPerFrame;
+        private const float VerticalAccelerationOnAscent = -600.0f * (float)Defines.SecondsPerFrame * (float)Defines.SecondsPerFrame;
 
         /// <summary>
         /// 下降時の垂直方向の加速度[pixel/frame]。
         /// </summary>
-        private const float VerticalAccelerationOnDescent = -30.0f * (float)Defines.SecondsPerFrame;
+        private const float VerticalAccelerationOnDescent = -1800.0f * (float)Defines.SecondsPerFrame * (float)Defines.SecondsPerFrame;
 
         /// <summary>
         /// ジャンプ開始時の水平方向の初速度[pixel/frame]。
@@ -39,12 +39,17 @@ namespace Game.Logic
         /// <summary>
         /// 垂直方向の最大速度[pixel/frame]。
         /// </summary>
-        private const float VerticalMaxVelocity = VerticalInitialVelocity;
+        private const float VerticalMaxVelocity = 960.0f * (float)Defines.SecondsPerFrame;
 
         /// <summary>
         /// 垂直方向の最小速度[pixel/frame]。
         /// </summary>
-        private const float VerticalMinVelocity = -VerticalInitialVelocity;
+        private const float VerticalMinVelocity = -960.0f * (float)Defines.SecondsPerFrame;
+
+        /// <summary>
+        /// 垂直方向の0に丸める速度[pixel/frame]。
+        /// </summary>
+        private const float VerticalRoundToZeroVelocity = 30.0f * (float)Defines.SecondsPerFrame;
 
         /// <summary>
         /// 移動可能範囲。
@@ -52,9 +57,19 @@ namespace Game.Logic
         private static readonly Rect LocationRect = new(-432.0f + PlayerSize * 0.5f, -222.0f + PlayerSize * 0.5f, 864.0f - PlayerSize, 444.0f - PlayerSize);
 
         /// <summary>
-        /// 攻撃のインターバル。
+        /// 反発係数。
         /// </summary>
-        private const int AttackInterval = 4;
+        private const float CoefficientOfRestitution = 0.5f;
+
+        /// <summary>
+        /// 攻撃のインターバル[frame]。
+        /// </summary>
+        private const int AttackInterval = (int)(Defines.FramePerSec * 5.0 / 60.0);
+
+        /// <summary>
+        /// 弾の速度[pixel/frame]
+        /// </summary>
+        private const float BulletVelocityX = 480.0f * (float)Defines.SecondsPerFrame;
 
         #endregion
 
@@ -99,7 +114,7 @@ namespace Game.Logic
         /// <summary>
         /// 更新する。
         /// </summary>
-        /// <param name="isKeyPressed">キーが押されていればtrue。</param>
+        /// <param name="isKeyPressed">キーが押されているか。</param>
         /// <param name="playerBulletLogics">弾配列。</param>
         public void UpdateStatus(bool isKeyPressed, List<BulletLogic> playerBulletLogics)
         {
@@ -114,42 +129,64 @@ namespace Game.Logic
             // キーの押下状態を更新
             _wasKeyPressed = isKeyPressed;
 
-            // 位置を更新
-            _location += _velocity;
+            // 加速度を更新(ボタンを離しているときは加速度が大きくなる)
+            _verticalAcceleration = isKeyPressed ? VerticalAccelerationOnAscent : VerticalAccelerationOnDescent;
 
-            // x方向の領域を越えた場合はx座標を制限してx方向の速度を0にする
+            // 速度を更新
+            var previousVelocity = _velocity;
+            _velocity.y = Mathf.Clamp(_velocity.y + _verticalAcceleration, VerticalMinVelocity, VerticalMaxVelocity);
+
+            // 位置を更新
+            _location += (_velocity + previousVelocity) * 0.5f;
+
+            // x方向の領域を越えた場合
             if (_location.x < LocationRect.xMin)
             {
-                _location.x = LocationRect.xMin;
-                _velocity.x = 0.0f;
+                FlipX(LocationRect.xMin);
             }
             else if (_location.x > LocationRect.xMax)
             {
-                _location.x = LocationRect.xMax;
-                _velocity.x = 0.0f;
+                FlipX(LocationRect.xMax);
             }
 
-            // y方向の領域を越えた場合はy座標を制限して速度を0にする
+            // y方向の領域を越えた場合
             if (_location.y < LocationRect.yMin)
             {
-                _location.y = LocationRect.yMin;
-                _velocity = Vector2.zero;
+                FlipY(LocationRect.yMin, isKeyPressed);
             }
             else if (_location.y > LocationRect.yMax)
             {
-                _location.y = LocationRect.yMax;
-                _velocity = Vector2.zero;
+                FlipY(LocationRect.yMax, isKeyPressed);
             }
-
-            // 速度を更新
-            _velocity.y = Mathf.Clamp(_velocity.y + _verticalAcceleration, VerticalMinVelocity, VerticalMaxVelocity);
-
-            // 加速度を更新
-            // ボタンを離している、もしくは下降しているときは加速度が大きくなる
-            _verticalAcceleration = isKeyPressed && _velocity.y >= 0.0f ? VerticalAccelerationOnAscent : VerticalAccelerationOnDescent;
 
             // 弾を撃つ
             Shoot(playerBulletLogics);
+        }
+
+        /// <summary>
+        /// x方向の向きを反転する。
+        /// </summary>
+        /// <param name="locationX">反転時のx座標。</param>
+        private void FlipX(float locationX)
+        {
+            _location.x = locationX;
+            _velocity.x *= -1.0f;
+            _flipped = !_flipped;
+        }
+
+        /// <summary>
+        /// y方向の向きを反転する。
+        /// </summary>
+        /// <param name="locationY">反転時のy座標。</param>
+        /// <param name="isKeyPressed">キーが押されているか。</param>
+        private void FlipY(float locationY, bool isKeyPressed)
+        {
+            _location.y = locationY;
+            _velocity.y *= isKeyPressed ? 0.0f : -CoefficientOfRestitution;
+            if (Mathf.Abs(_velocity.y) < VerticalRoundToZeroVelocity)
+            {
+                _velocity.y = 0.0f;
+            }
         }
 
         /// <summary>
@@ -171,7 +208,7 @@ namespace Game.Logic
                 return;
             }
 
-            Vector2 bulletVelocity = new((_flipped ? -480.0f : 480.0f) * (float)Defines.SecondsPerFrame, 0.0f);
+            Vector2 bulletVelocity = new(_flipped ? -BulletVelocityX : BulletVelocityX, 0.0f);
             var bulletSize = 8.0f;
             bulletLogic.Create(_location, bulletVelocity, bulletSize);
         }
