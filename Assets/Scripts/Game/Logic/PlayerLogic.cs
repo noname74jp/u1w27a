@@ -114,7 +114,7 @@ namespace Game.Logic
         /// </summary>
         public void Create()
         {
-            base.Create(Vector2.zero, Vector2.zero, PlayerSize);
+            base.Create(new Vector2(LocationRect.center.x, LocationRect.yMin), Vector2.zero, PlayerSize);
             _verticalAcceleration = VerticalAccelerationOnDescent;
             _flipped = false;
             _wasKeyPressed = false;
