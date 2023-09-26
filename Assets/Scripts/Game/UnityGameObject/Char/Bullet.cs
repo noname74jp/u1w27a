@@ -26,7 +26,7 @@ namespace Game.UnityGameObject.Char
         public void UpdateStatus(LogicBase logic)
         {
             spriteRenderer.enabled = logic.Alive;
-            transform.position = logic.Location;
+            transform.localPosition = logic.Location;
         }
 
         #endregion

@@ -93,6 +93,11 @@ namespace Game.UnityGameObject
         [SerializeField] private InputActionData inputActionData;
 
         /// <summary>
+        /// ワールドのルートのオブジェクト。
+        /// </summary>
+        [SerializeField] private WorldRoot worldRoot;
+
+        /// <summary>
         /// プレイヤーのオブジェクト。
         /// </summary>
         [SerializeField] private Player player;
@@ -263,6 +268,7 @@ namespace Game.UnityGameObject
                 }
 
                 // Unity上の更新
+                worldRoot.UpdateStatus(_playerLogic);
                 player.UpdateStatus(_playerLogic);
                 for (var i = 0; i < playerBulletCoordinator.Bullets.Count; i++)
                 {

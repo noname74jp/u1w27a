@@ -15,7 +15,7 @@ namespace Game.UnityGameObject.Char
         /// </summary>
         public void Initialize()
         {
-            transform.position = Vector3.zero;
+            transform.localPosition = Vector3.zero;
         }
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace Game.UnityGameObject.Char
         /// <param name="logic">更新に使用するロジック。</param>
         public void UpdateStatus(LogicBase logic)
         {
-            transform.position = logic.Location;
+            transform.localPosition = logic.Location;
         }
 
         #endregion
