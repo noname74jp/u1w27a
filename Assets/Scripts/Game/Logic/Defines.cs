@@ -20,9 +20,19 @@ namespace Game.Logic
         public const double SecondsPerFrame = 1.0 / FramePerSec;
 
         /// <summary>
+        /// グリッドの数。
+        /// </summary>
+        public const int GridCount = 12;
+
+        /// <summary>
+        /// グリッドの横幅。
+        /// </summary>
+        public const float GridWidth = 72.0f;
+
+        /// <summary>
         /// 有効な範囲。
         /// </summary>
-        public static readonly Rect ValidArea = new(-432.0f, -222.0f, 864.0f, 444.0f);
+        public static readonly Rect ValidArea = new(-GridWidth * GridCount * 0.5f, -222.0f, GridWidth * GridCount, 444.0f);
 
         #endregion
     }

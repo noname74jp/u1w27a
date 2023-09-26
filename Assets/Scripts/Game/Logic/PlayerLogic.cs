@@ -74,12 +74,12 @@ namespace Game.Logic
         /// <summary>
         /// 左の折り返し位置。
         /// </summary>
-        private const float LeftTurnAroundPoint = -256.0f;
+        private const float LeftTurnAroundPoint = Defines.GridWidth * -4.0f;
 
         /// <summary>
         /// 右の折り返し位置。
         /// </summary>
-        private const float RightTurnAroundPoint = 256.0f;
+        private const float RightTurnAroundPoint = Defines.GridWidth * 4.0f;
 
         #endregion
 
