@@ -71,6 +71,16 @@ namespace Game.Logic
         /// </summary>
         private const float BulletVelocityX = 480.0f * (float)Defines.SecondsPerFrame;
 
+        /// <summary>
+        /// 左の折り返し位置。
+        /// </summary>
+        private const float LeftTurnAroundPoint = -256.0f;
+
+        /// <summary>
+        /// 右の折り返し位置。
+        /// </summary>
+        private const float RightTurnAroundPoint = 256.0f;
+
         #endregion
 
         #region variables
@@ -121,9 +131,18 @@ namespace Game.Logic
             // ジャンプ
             if (isKeyPressed && !_wasKeyPressed)
             {
-                _flipped = !_flipped;
+                // 折り返し点を越えていたら反転
+                if (_flipped && _location.x <= LeftTurnAroundPoint)
+                {
+                    _flipped = false;
+                }
+                else if (!_flipped && _location.x >= RightTurnAroundPoint)
+                {
+                    _flipped = true;
+                }
+
+                // 速度を設定
                 _velocity = new Vector2(_flipped ? -HorizontalInitialVelocity : HorizontalInitialVelocity, VerticalInitialVelocity);
-                _verticalAcceleration = VerticalAccelerationOnAscent;
             }
 
             // キーの押下状態を更新
