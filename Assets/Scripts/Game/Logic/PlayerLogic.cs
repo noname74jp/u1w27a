@@ -131,15 +131,13 @@ namespace Game.Logic
             // ジャンプ
             if (isKeyPressed && !_wasKeyPressed)
             {
-                // 折り返し点を越えていたら反転
-                if (_flipped && _location.x <= LeftTurnAroundPoint)
+                _flipped = _flipped switch
                 {
-                    _flipped = false;
-                }
-                else if (!_flipped && _location.x >= RightTurnAroundPoint)
-                {
-                    _flipped = true;
-                }
+                    // 折り返し点を越えていたら反転
+                    true when _location.x <= LeftTurnAroundPoint => false,
+                    false when _location.x >= RightTurnAroundPoint => true,
+                    _ => _flipped
+                };
 
                 // 速度を設定
                 _velocity = new Vector2(_flipped ? -HorizontalInitialVelocity : HorizontalInitialVelocity, VerticalInitialVelocity);

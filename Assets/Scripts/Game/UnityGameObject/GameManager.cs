@@ -4,6 +4,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Game.Logic;
 using Game.UnityGameObject.Char;
+using Game.UnityGameObject.UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -93,6 +94,11 @@ namespace Game.UnityGameObject
         [SerializeField] private InputActionData inputActionData;
 
         /// <summary>
+        /// スコアボード。
+        /// </summary>
+        [SerializeField] private ScoreBoard scoreBoard;
+
+        /// <summary>
         /// ワールドのルートのオブジェクト。
         /// </summary>
         [SerializeField] private WorldRoot worldRoot;
@@ -121,6 +127,11 @@ namespace Game.UnityGameObject
         /// タイマー。
         /// </summary>
         private double _timer;
+
+        /// <summary>
+        /// スコア。
+        /// </summary>
+        private int _score;
 
         /// <summary>
         /// キャンセルトークン。
@@ -196,6 +207,7 @@ namespace Game.UnityGameObject
         private void Initialize()
         {
             _timer = 0.0;
+            _score = 0;
             _playerLogic = new PlayerLogic();
             _playerLogic.Create();
             _playerBulletLogics = new List<BulletLogic>();
@@ -206,6 +218,7 @@ namespace Game.UnityGameObject
             }
 
             player.UpdateStatus(_playerLogic);
+            scoreBoard.SetScore(_score);
         }
 
         /// <summary>
@@ -268,6 +281,9 @@ namespace Game.UnityGameObject
                 }
 
                 // Unity上の更新
+                _score++; // TODO: nn74: スコア計算
+                _score++; // TODO: nn74: スコア計算
+                scoreBoard.SetScore(_score);
                 worldRoot.UpdateStatus(_playerLogic);
                 player.UpdateStatus(_playerLogic);
                 for (var i = 0; i < playerBulletCoordinator.Bullets.Count; i++)
