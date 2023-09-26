@@ -79,7 +79,7 @@ namespace Library
         private void Update()
         {
             // 更新が不要なら抜ける
-            if (!_needUpdate)
+            if (!_needUpdate || _materialPropertyBlock == null)
             {
                 return;
             }
