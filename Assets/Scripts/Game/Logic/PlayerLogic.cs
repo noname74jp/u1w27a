@@ -17,19 +17,24 @@ namespace Game.Logic
         private const float PlayerSize = 32.0f;
 
         /// <summary>
-        /// 上昇時の垂直方向の加速度[pixel/frame]。
+        /// グライド時の垂直方向の加速度[pixel/frame]。
         /// </summary>
-        private const float VerticalAccelerationOnAscent = -600.0f * (float)Defines.SecondsPerFrame * (float)Defines.SecondsPerFrame;
+        private const float VerticalAccelerationInGlide = -600.0f * (float)Defines.SecondsPerFrame * (float)Defines.SecondsPerFrame;
 
         /// <summary>
-        /// 下降時の垂直方向の加速度[pixel/frame]。
+        /// 落下時の垂直方向の加速度[pixel/frame]。
         /// </summary>
-        private const float VerticalAccelerationOnDescent = -1800.0f * (float)Defines.SecondsPerFrame * (float)Defines.SecondsPerFrame;
+        private const float VerticalAccelerationAtFall = -1800.0f * (float)Defines.SecondsPerFrame * (float)Defines.SecondsPerFrame;
 
         /// <summary>
-        /// ジャンプ開始時の水平方向の初速度[pixel/frame]。
+        /// グライド時の水平方向の速度[pixel/frame]。
         /// </summary>
-        private const float HorizontalInitialVelocity = 240.0f * (float)Defines.SecondsPerFrame;
+        private const float HorizontalVelocityInGlide = 320.0f * (float)Defines.SecondsPerFrame;
+
+        /// <summary>
+        /// 落下時の水平方向の速度[pixel/frame]。
+        /// </summary>
+        private const float HorizontalVelocityAtFall = 160.0f * (float)Defines.SecondsPerFrame;
 
         /// <summary>
         /// ジャンプ開始時の垂直方向の初速度[pixel/frame]。
@@ -39,12 +44,12 @@ namespace Game.Logic
         /// <summary>
         /// 垂直方向の最大速度[pixel/frame]。
         /// </summary>
-        private const float VerticalMaxVelocity = 960.0f * (float)Defines.SecondsPerFrame;
+        private const float VerticalMaxVelocity = 1440.0f * (float)Defines.SecondsPerFrame;
 
         /// <summary>
         /// 垂直方向の最小速度[pixel/frame]。
         /// </summary>
-        private const float VerticalMinVelocity = -960.0f * (float)Defines.SecondsPerFrame;
+        private const float VerticalMinVelocity = -1440.0f * (float)Defines.SecondsPerFrame;
 
         /// <summary>
         /// 垂直方向の0に丸める速度[pixel/frame]。
@@ -115,7 +120,7 @@ namespace Game.Logic
         public void Create()
         {
             base.Create(new Vector2(LocationRect.center.x, LocationRect.yMin), Vector2.zero, PlayerSize);
-            _verticalAcceleration = VerticalAccelerationOnDescent;
+            _verticalAcceleration = VerticalAccelerationAtFall;
             _flipped = false;
             _wasKeyPressed = false;
             _remainAttackInterval = AttackInterval;
@@ -140,17 +145,18 @@ namespace Game.Logic
                 };
 
                 // 速度を設定
-                _velocity = new Vector2(_flipped ? -HorizontalInitialVelocity : HorizontalInitialVelocity, VerticalInitialVelocity);
+                _velocity = new Vector2(_flipped ? -HorizontalVelocityInGlide : HorizontalVelocityInGlide, VerticalInitialVelocity);
             }
 
             // キーの押下状態を更新
             _wasKeyPressed = isKeyPressed;
 
             // 加速度を更新(ボタンを離しているときは加速度が大きくなる)
-            _verticalAcceleration = isKeyPressed ? VerticalAccelerationOnAscent : VerticalAccelerationOnDescent;
+            _verticalAcceleration = isKeyPressed ? VerticalAccelerationInGlide : VerticalAccelerationAtFall;
 
             // 速度を更新
             var previousVelocity = _velocity;
+            _velocity.x = (_flipped ? -1 : 1) * (isKeyPressed ? HorizontalVelocityInGlide : HorizontalVelocityAtFall);
             _velocity.y = Mathf.Clamp(_velocity.y + _verticalAcceleration, VerticalMinVelocity, VerticalMaxVelocity);
 
             // 位置を更新
