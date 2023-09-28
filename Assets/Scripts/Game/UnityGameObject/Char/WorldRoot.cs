@@ -19,26 +19,26 @@ namespace Game.UnityGameObject.Char
             var scale = logic.Location.y >= 0.0f ? 1.0f : 1.0f - logic.Location.y * 0.0075f;
 
             // スケールを考慮した、プレイヤーが中央になる領域を作成
-            var rect = new Rect((Defines.ValidArea.position - logic.Location) * scale, Defines.ValidArea.size * scale);
+            var rect = new Rect((Defines.PlayerValidArea.position - logic.Location) * scale, Defines.PlayerValidArea.size * scale);
 
             // x方向を制限
-            if (rect.xMin > Defines.ValidArea.xMin)
+            if (rect.xMin > Defines.PlayerValidArea.xMin)
             {
-                rect.x += Defines.ValidArea.xMin - rect.xMin;
+                rect.x += Defines.PlayerValidArea.xMin - rect.xMin;
             }
-            else if (rect.xMax < Defines.ValidArea.xMax)
+            else if (rect.xMax < Defines.PlayerValidArea.xMax)
             {
-                rect.x += Defines.ValidArea.xMax - rect.xMax;
+                rect.x += Defines.PlayerValidArea.xMax - rect.xMax;
             }
 
             // y方向を制限
-            if (rect.yMin > Defines.ValidArea.yMin)
+            if (rect.yMin > Defines.PlayerValidArea.yMin)
             {
-                rect.y += Defines.ValidArea.yMin - rect.yMin;
+                rect.y += Defines.PlayerValidArea.yMin - rect.yMin;
             }
-            else if (rect.yMax < Defines.ValidArea.yMax)
+            else if (rect.yMax < Defines.PlayerValidArea.yMax)
             {
-                rect.y += Defines.ValidArea.yMax - rect.yMax;
+                rect.y += Defines.PlayerValidArea.yMax - rect.yMax;
             }
 
             // transformを更新

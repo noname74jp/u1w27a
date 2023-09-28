@@ -30,9 +30,19 @@ namespace Game.Logic
         public const float GridWidth = 72.0f;
 
         /// <summary>
-        /// 有効な範囲。
+        /// プレイヤーの有効な範囲。
         /// </summary>
-        public static readonly Rect ValidArea = new(-GridWidth * GridCount * 0.5f, -222.0f, GridWidth * GridCount, 444.0f);
+        public static readonly Rect PlayerValidArea = new(-GridWidth * GridCount * 0.5f, -222.0f, GridWidth * GridCount, 444.0f);
+
+        /// <summary>
+        /// 弾の有効な範囲。
+        /// </summary>
+        public static readonly Rect BulletValidArea = new(-480.0f, -270.0f, 960.0f, 540.0f);
+
+        /// <summary>
+        /// 敵の有効な範囲。
+        /// </summary>
+        public static readonly Rect EnemyValidArea = new(-480.0f - 64.0f, -270.0f - 64.0f, 960.0f + 128.0f, 540.0f + 128.0f);
 
         #endregion
     }

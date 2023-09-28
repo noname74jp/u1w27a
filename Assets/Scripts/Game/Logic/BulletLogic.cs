@@ -35,7 +35,7 @@ namespace Game.Logic
             _location += _velocity;
 
             // 領域外に出たら破棄
-            if (!Rect.Overlaps(Defines.ValidArea))
+            if (!Rect.Overlaps(Defines.BulletValidArea))
             {
                 Destroy();
             }

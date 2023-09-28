@@ -15,12 +15,6 @@ namespace Game.UnityGameObject
     /// </summary>
     public class GameManager : MonoBehaviour
     {
-        #region constants
-
-        private const int BulletCount = 32;
-
-        #endregion
-
         #region classes
 
         /// <summary>
@@ -86,6 +80,20 @@ namespace Game.UnityGameObject
 
         #endregion
 
+        #region constants
+
+        /// <summary>
+        /// プレイヤーの弾数。
+        /// </summary>
+        private const int PlayerBulletCount = 32;
+
+        /// <summary>
+        /// 敵数。
+        /// </summary>
+        private const int EnemyCount = 512;
+
+        #endregion
+
         #region variables
 
         /// <summary>
@@ -114,6 +122,11 @@ namespace Game.UnityGameObject
         [SerializeField] private BulletCoordinator playerBulletCoordinator;
 
         /// <summary>
+        /// 敵管理。
+        /// </summary>
+        [SerializeField] private EnemyCoordinator enemyCoordinator;
+
+        /// <summary>
         /// プレイヤーのロジック。
         /// </summary>
         private PlayerLogic _playerLogic;
@@ -122,6 +135,11 @@ namespace Game.UnityGameObject
         /// プレイヤー弾のロジック。
         /// </summary>
         private List<BulletLogic> _playerBulletLogics;
+
+        /// <summary>
+        /// 敵生成のロジック。
+        /// </summary>
+        private EnemySpawnerLogic _enemySpawnerLogic;
 
         /// <summary>
         /// タイマー。
@@ -147,7 +165,8 @@ namespace Game.UnityGameObject
         /// </summary>
         private void Awake()
         {
-            playerBulletCoordinator.Initialize(BulletCount);
+            playerBulletCoordinator.Initialize(PlayerBulletCount);
+            enemyCoordinator.Initialize(EnemyCount);
             StartGameLoop();
         }
 
@@ -217,6 +236,14 @@ namespace Game.UnityGameObject
                 _playerBulletLogics.Add(playerBulletLogic);
             }
 
+            _enemySpawnerLogic = new EnemySpawnerLogic(EnemyCount);
+            var enemyIndex = 0;
+            foreach (var enemy in _enemySpawnerLogic.Enemies)
+            {
+                enemyCoordinator.Enemies[enemyIndex].Initialize(enemy);
+                enemyIndex++;
+            }
+
             player.UpdateStatus(_playerLogic);
             scoreBoard.SetScore(_score);
         }
@@ -278,6 +305,7 @@ namespace Game.UnityGameObject
                     _timer -= Defines.SecondsPerFrame;
                     _playerLogic.UpdateStatus(isDecideKeyPressed, _playerBulletLogics);
                     _playerBulletLogics.ForEach(logic => logic.UpdateStatus());
+                    _enemySpawnerLogic.UpdateStatus(_playerLogic);
                 }
 
                 // Unity上の更新
@@ -289,6 +317,11 @@ namespace Game.UnityGameObject
                 for (var i = 0; i < playerBulletCoordinator.Bullets.Count; i++)
                 {
                     playerBulletCoordinator.Bullets[i].UpdateStatus(_playerBulletLogics[i]);
+                }
+
+                foreach (var enemy in enemyCoordinator.Enemies)
+                {
+                    enemy.UpdateStatus();
                 }
 
                 // 次のフレームへ

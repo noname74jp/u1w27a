@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Game.UnityGameObject.Char
 {
     /// <summary>
-    /// 弾管理
+    /// 弾管理。
     /// </summary>
     public class BulletCoordinator : MonoBehaviour
     {
