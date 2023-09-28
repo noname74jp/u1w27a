@@ -18,7 +18,7 @@ namespace Game.Logic
             // 距離の2乗がサイズの和の2乗以下ならヒット
             foreach (var logic in logics)
             {
-                var totalSize = _size + logic.Size;
+                var totalSize = (_size + logic.Size) * 0.5f; // _sizeは直径で距離判定は半径のため0.5倍
                 var sqrMagnitude = (_location - logic.Location).sqrMagnitude;
                 if (sqrMagnitude <= totalSize * totalSize)
                 {
@@ -71,7 +71,7 @@ namespace Game.Logic
         protected Vector2 _velocity;
 
         /// <summary>
-        /// サイズ。
+        /// サイズ(直径)[pixel]。
         /// </summary>
         private float _size;
 
@@ -95,7 +95,7 @@ namespace Game.Logic
         public Vector2 Velocity => _velocity;
 
         /// <summary>
-        /// サイズ。
+        /// サイズ(直径)[pixel]。
         /// </summary>
         public float Size => _size;
 
