@@ -244,7 +244,7 @@ namespace Game.UnityGameObject
                 enemyIndex++;
             }
 
-            player.UpdateStatus(_playerLogic);
+            player.Initialize(_playerLogic);
             scoreBoard.SetScore(_score);
         }
 
@@ -313,7 +313,7 @@ namespace Game.UnityGameObject
                 _score++; // TODO: nn74: スコア計算
                 scoreBoard.SetScore(_score);
                 worldRoot.UpdateStatus(_playerLogic);
-                player.UpdateStatus(_playerLogic);
+                player.UpdateStatus();
                 for (var i = 0; i < playerBulletCoordinator.Bullets.Count; i++)
                 {
                     playerBulletCoordinator.Bullets[i].UpdateStatus(_playerBulletLogics[i]);

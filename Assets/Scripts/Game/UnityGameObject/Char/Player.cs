@@ -8,23 +8,33 @@ namespace Game.UnityGameObject.Char
     /// </summary>
     public class Player : MonoBehaviour
     {
+        #region variables
+
+        /// <summary>
+        /// ロジック。
+        /// </summary>
+        private PlayerLogic _logic;
+
+        #endregion
+
         #region methods
 
         /// <summary>
         /// 初期化する。
         /// </summary>
-        public void Initialize()
+        /// <param name="logic">ロジック。</param>
+        public void Initialize(PlayerLogic logic)
         {
-            transform.localPosition = Vector3.zero;
+            _logic = logic;
+            transform.localPosition = logic.Location;
         }
 
         /// <summary>
         /// 状態を更新する。
         /// </summary>
-        /// <param name="logic">更新に使用するロジック。</param>
-        public void UpdateStatus(LogicBase logic)
+        public void UpdateStatus()
         {
-            transform.localPosition = logic.Location;
+            transform.localPosition = _logic.Location;
         }
 
         #endregion
