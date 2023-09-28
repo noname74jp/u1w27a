@@ -1,9 +1,37 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Game.Logic
 {
     public class LogicBase
     {
+        #region methods
+
+        /// <summary>
+        /// ヒットしている対象を見つける。
+        /// </summary>
+        /// <param name="logics">判定対象のロジック群。</param>
+        /// <typeparam name="T">ロジックの型。</typeparam>
+        /// <returns>ヒットしているならそのロジック。していないならnull。</returns>
+        public T FindHitTarget<T>(IEnumerable<T> logics) where T : LogicBase
+        {
+            // 距離の2乗がサイズの和の2乗以下ならヒット
+            foreach (var logic in logics)
+            {
+                var totalSize = _size + logic.Size;
+                var sqrMagnitude = (_location - logic.Location).sqrMagnitude;
+                if (sqrMagnitude <= totalSize * totalSize)
+                {
+                    return logic;
+                }
+            }
+
+            // 何もヒットしていなければnull
+            return null;
+        }
+
+        #endregion
+
         #region methods
 
         /// <summary>
@@ -23,7 +51,7 @@ namespace Game.Logic
         /// <summary>
         /// 破棄する。
         /// </summary>
-        public void Destroy()
+        protected void Destroy()
         {
             _alive = false;
         }
@@ -45,7 +73,7 @@ namespace Game.Logic
         /// <summary>
         /// サイズ。
         /// </summary>
-        protected float _size;
+        private float _size;
 
         /// <summary>
         /// 生存しているか。
