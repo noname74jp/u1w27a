@@ -299,18 +299,30 @@ namespace Game.UnityGameObject
                 }
 
                 // ロジックの更新
+                var isGameOver = false;
                 _timer += Time.deltaTime;
                 while (_timer >= Defines.SecondsPerFrame)
                 {
                     _timer -= Defines.SecondsPerFrame;
+
+                    // 状態を更新
                     _playerLogic.UpdateStatus(isDecideKeyPressed, _playerBulletLogics);
                     _playerBulletLogics.ForEach(logic => logic.UpdateStatus());
                     _enemySpawnerLogic.UpdateStatus(_playerLogic);
+
+                    // ヒット判定
+                    var hitEnemy = _playerLogic.FindHitTarget(_enemySpawnerLogic.ActiveEnemies);
+                    if (hitEnemy != null)
+                    {
+                        isGameOver = true;
+                        break;
+                    }
+
+                    // 生存ボーナス
+                    _score++; // TODO: nn74: スコア計算
                 }
 
                 // Unity上の更新
-                _score++; // TODO: nn74: スコア計算
-                _score++; // TODO: nn74: スコア計算
                 scoreBoard.SetScore(_score);
                 worldRoot.UpdateStatus(_playerLogic);
                 player.UpdateStatus();
@@ -323,6 +335,50 @@ namespace Game.UnityGameObject
                 {
                     enemy.UpdateStatus();
                 }
+
+                // プレイヤーが死んでいたら抜ける
+                if (isGameOver)
+                {
+                    UpdateGameOver(token).Forget();
+                    return;
+                }
+
+                // 次のフレームへ
+                await UniTask.NextFrame(token);
+            }
+        }
+
+        /// <summary>
+        /// ゲームオーバーを更新する。
+        /// </summary>
+        /// <param name="token">キャンセルトークン。</param>
+        private async UniTaskVoid UpdateGameOver(CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+
+            // メインループ
+            while (true)
+            {
+                // 入力管理
+                var isRetryKeyPressed = inputActionData.IsRetryKeyPressed();
+
+                // リトライ
+                if (isRetryKeyPressed)
+                {
+                    UpdateTitle(token).Forget();
+                    break;
+                }
+
+                // ロジックの更新
+                _timer += Time.deltaTime;
+                while (_timer >= Defines.SecondsPerFrame)
+                {
+                    _timer -= Defines.SecondsPerFrame;
+                }
+
+                // Unity上の更新
+                worldRoot.UpdateStatus(_playerLogic);
+                player.UpdateStatus();
 
                 // 次のフレームへ
                 await UniTask.NextFrame(token);
