@@ -26,7 +26,7 @@ namespace Game.UnityGameObject.Char
         public void Initialize(PlayerLogic logic)
         {
             _logic = logic;
-            transform.localPosition = logic.Location;
+            UpdateStatus();
         }
 
         /// <summary>
