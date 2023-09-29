@@ -36,7 +36,7 @@ namespace Game.Logic
             {
                 case EnemyType.Enemy00:
                     const float velocityX = 100.0f;
-                    base.Create(location, new Vector2(location.x > 0.0f ? -velocityX : velocityX, 0.0f), 8.0f);
+                    base.Create(location, new Vector2(location.x > 0.0f ? -velocityX : velocityX, 0.0f), 21.0f);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(enemyType), enemyType, null);

@@ -14,9 +14,9 @@ namespace Game.Logic
         /// </summary>
         /// <param name="location">初期座標。</param>
         /// <param name="velocity">初期速度。</param>
-        /// <param name="size">初期サイズ。</param>
-        public new void Create(Vector2 location, Vector2 velocity, float size)
+        public void Create(Vector2 location, Vector2 velocity)
         {
+            const float size = 10.5f;
             base.Create(location, velocity, size);
         }
 

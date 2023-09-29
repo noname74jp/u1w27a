@@ -14,7 +14,7 @@ namespace Game.Logic
         /// <summary>
         /// プレイヤーのサイズ[pixel]。
         /// </summary>
-        private const float PlayerSize = 32.0f;
+        private const float PlayerSize = 21.0f;
 
         /// <summary>
         /// グライド時の垂直方向の加速度[pixel/frame]。
@@ -232,8 +232,7 @@ namespace Game.Logic
             }
 
             Vector2 bulletVelocity = new(_flipped ? -BulletVelocityX : BulletVelocityX, 0.0f);
-            var bulletSize = 8.0f;
-            bulletLogic.Create(_location, bulletVelocity, bulletSize);
+            bulletLogic.Create(_location, bulletVelocity);
         }
 
         #endregion

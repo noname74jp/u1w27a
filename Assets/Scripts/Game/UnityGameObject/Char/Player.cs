@@ -34,7 +34,9 @@ namespace Game.UnityGameObject.Char
         /// </summary>
         public void UpdateStatus()
         {
-            transform.localPosition = _logic.Location;
+            var transformCache = transform;
+            transformCache.localPosition = _logic.Location;
+            transformCache.localScale = Vector3.one * (_logic.Size * 60.0f / 52.0f);
         }
 
         #endregion

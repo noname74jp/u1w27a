@@ -230,10 +230,11 @@ namespace Game.UnityGameObject
             _playerLogic = new PlayerLogic();
             _playerLogic.Create();
             _playerBulletLogics = new List<BulletLogic>();
-            for (var i = 0; i < playerBulletCoordinator.Bullets.Count; i++)
+            foreach (var playerBullet in playerBulletCoordinator.Bullets)
             {
                 BulletLogic playerBulletLogic = new();
                 _playerBulletLogics.Add(playerBulletLogic);
+                playerBullet.Initialize(playerBulletLogic);
             }
 
             _enemySpawnerLogic = new EnemySpawnerLogic(EnemyCount);
@@ -342,9 +343,9 @@ namespace Game.UnityGameObject
                 scoreBoard.SetScore(_score);
                 worldRoot.UpdateStatus(_playerLogic);
                 player.UpdateStatus();
-                for (var i = 0; i < playerBulletCoordinator.Bullets.Count; i++)
+                foreach (var playerBullet in playerBulletCoordinator.Bullets)
                 {
-                    playerBulletCoordinator.Bullets[i].UpdateStatus(_playerBulletLogics[i]);
+                    playerBullet.UpdateStatus();
                 }
 
                 foreach (var enemy in enemyCoordinator.Enemies)

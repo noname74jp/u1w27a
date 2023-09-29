@@ -15,18 +15,39 @@ namespace Game.UnityGameObject.Char
         /// </summary>
         [SerializeField] private SpriteRenderer spriteRenderer;
 
+        /// <summary>
+        /// ロジック。
+        /// </summary>
+        private BulletLogic _logic;
+
         #endregion
 
         #region methods
 
         /// <summary>
+        /// 初期化する。
+        /// </summary>
+        /// <param name="logic">設定するロジック。</param>
+        public void Initialize(BulletLogic logic)
+        {
+            _logic = logic;
+            spriteRenderer.enabled = false;
+        }
+
+        /// <summary>
         /// 状態を更新する。
         /// </summary>
-        /// <param name="logic">更新に使用するロジック。</param>
-        public void UpdateStatus(CharLogicBase logic)
+        public void UpdateStatus()
         {
-            spriteRenderer.enabled = logic.Alive;
-            transform.localPosition = logic.Location;
+            spriteRenderer.enabled = _logic.Alive;
+            if (!_logic.Alive)
+            {
+                return;
+            }
+
+            var transformCache = transform;
+            transformCache.localPosition = _logic.Location;
+            transformCache.localScale = Vector3.one * (_logic.Size * 60.0f / 52.0f);
         }
 
         #endregion
