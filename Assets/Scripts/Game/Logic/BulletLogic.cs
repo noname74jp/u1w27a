@@ -5,7 +5,7 @@ namespace Game.Logic
     /// <summary>
     /// 弾のロジック。
     /// </summary>
-    public class BulletLogic : LogicBase
+    public class BulletLogic : CharLogicBase
     {
         #region methods
 

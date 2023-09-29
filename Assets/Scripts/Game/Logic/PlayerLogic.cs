@@ -7,7 +7,7 @@ namespace Game.Logic
     /// <summary>
     /// プレイヤーのロジック。
     /// </summary>
-    public class PlayerLogic : LogicBase
+    public class PlayerLogic : CharLogicBase
     {
         #region constants
 

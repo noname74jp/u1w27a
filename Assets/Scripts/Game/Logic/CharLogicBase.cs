@@ -3,7 +3,10 @@ using UnityEngine;
 
 namespace Game.Logic
 {
-    public class LogicBase
+    /// <summary>
+    /// キャラのロジックのベース。
+    /// </summary>
+    public abstract class CharLogicBase
     {
         #region methods
 
@@ -13,7 +16,7 @@ namespace Game.Logic
         /// <param name="logics">判定対象のロジック群。</param>
         /// <typeparam name="T">ロジックの型。</typeparam>
         /// <returns>ヒットしているならそのロジック。していないならnull。</returns>
-        public T FindHitTarget<T>(IEnumerable<T> logics) where T : LogicBase
+        public T FindHitTarget<T>(IEnumerable<T> logics) where T : CharLogicBase
         {
             // 距離の2乗がサイズの和の2乗以下ならヒット
             foreach (var logic in logics)

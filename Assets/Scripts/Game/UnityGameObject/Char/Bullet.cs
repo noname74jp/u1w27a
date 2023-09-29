@@ -23,7 +23,7 @@ namespace Game.UnityGameObject.Char
         /// 状態を更新する。
         /// </summary>
         /// <param name="logic">更新に使用するロジック。</param>
-        public void UpdateStatus(LogicBase logic)
+        public void UpdateStatus(CharLogicBase logic)
         {
             spriteRenderer.enabled = logic.Alive;
             transform.localPosition = logic.Location;

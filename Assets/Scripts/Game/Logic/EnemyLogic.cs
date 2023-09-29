@@ -6,7 +6,7 @@ namespace Game.Logic
     /// <summary>
     /// 敵のロジック。
     /// </summary>
-    public class EnemyLogic : LogicBase
+    public class EnemyLogic : CharLogicBase
     {
         #region enums
 
