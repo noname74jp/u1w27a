@@ -11,6 +11,11 @@ namespace Game.UnityGameObject.Char
         #region variables
 
         /// <summary>
+        /// 対象の<see cref="SpriteRenderer" />
+        /// </summary>
+        [SerializeField] private SpriteRenderer spriteRenderer;
+
+        /// <summary>
         /// ロジック。
         /// </summary>
         private PlayerLogic _logic;
@@ -37,6 +42,7 @@ namespace Game.UnityGameObject.Char
             var transformCache = transform;
             transformCache.localPosition = _logic.Location;
             transformCache.localScale = Vector3.one * (_logic.Size * 60.0f / 52.0f);
+            spriteRenderer.flipX = _logic.Velocity.x < 0.0f;
         }
 
         #endregion
