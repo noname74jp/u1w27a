@@ -8,18 +8,34 @@ namespace Game.UnityGameObject.Char
     /// </summary>
     public class WorldRoot : MonoBehaviour
     {
+        #region variables
+
+        /// <summary>
+        /// ロジック。
+        /// </summary>
+        private WorldRootLogic _logic;
+
+        #endregion
+
+        #region methods
+
+        /// <summary>
+        /// 初期化する。
+        /// </summary>
+        /// <param name="logic">ロジック。</param>
+        public void Initialize(WorldRootLogic logic)
+        {
+            _logic = logic;
+            UpdateStatus();
+        }
+
         /// <summary>
         /// 位置とスケールを更新する。
         /// </summary>
-        /// <param name="logic">更新に使用するロジック。</param>
-        public void UpdateStatus(PlayerLogic logic)
+        public void UpdateStatus()
         {
-            // スケールを計算
-            // TODO: nn74: scaleの値は仮
-            var scale = logic.Location.y >= 0.0f ? 1.0f : 1.0f - logic.Location.y * 0.0075f;
-
             // スケールを考慮した、プレイヤーが中央になる領域を作成
-            var rect = new Rect((Defines.PlayerValidArea.position - logic.Location) * scale, Defines.PlayerValidArea.size * scale);
+            var rect = new Rect((Defines.PlayerValidArea.position - _logic.Location) * _logic.Scale, Defines.PlayerValidArea.size * _logic.Scale);
 
             // x方向を制限
             if (rect.xMin > Defines.PlayerValidArea.xMin)
@@ -44,7 +60,9 @@ namespace Game.UnityGameObject.Char
             // transformを更新
             var transformAlias = transform;
             transformAlias.position = rect.center;
-            transformAlias.localScale = Vector3.one * scale;
+            transformAlias.localScale = Vector3.one * _logic.Scale;
         }
+
+        #endregion
     }
 }

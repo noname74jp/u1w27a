@@ -142,6 +142,11 @@ namespace Game.UnityGameObject
         private EnemySpawnerLogic _enemySpawnerLogic;
 
         /// <summary>
+        /// ワールドのルートのロジック。
+        /// </summary>
+        private WorldRootLogic _worldRootLogic;
+
+        /// <summary>
         /// タイマー。
         /// </summary>
         private double _timer;
@@ -227,8 +232,11 @@ namespace Game.UnityGameObject
         {
             _timer = 0.0;
             _score = 0;
+
             _playerLogic = new PlayerLogic();
             _playerLogic.Create();
+            player.Initialize(_playerLogic);
+
             _playerBulletLogics = new List<BulletLogic>();
             foreach (var playerBullet in playerBulletCoordinator.Bullets)
             {
@@ -245,7 +253,8 @@ namespace Game.UnityGameObject
                 enemyIndex++;
             }
 
-            player.Initialize(_playerLogic);
+            _worldRootLogic = new WorldRootLogic(_playerLogic);
+            worldRoot.Initialize(_worldRootLogic);
             scoreBoard.SetScore(_score);
         }
 
@@ -285,6 +294,8 @@ namespace Game.UnityGameObject
         {
             token.ThrowIfCancellationRequested();
 
+            _worldRootLogic.SetTargetScale(WorldRootLogic.MinScale);
+
             // メインループ
             while (true)
             {
@@ -310,6 +321,7 @@ namespace Game.UnityGameObject
                     _playerLogic.UpdateStatus(isDecideKeyPressed, _playerBulletLogics);
                     _playerBulletLogics.ForEach(logic => logic.UpdateStatus());
                     _enemySpawnerLogic.UpdateStatus(_playerLogic);
+                    _worldRootLogic.UpdateStatus();
 
                     // プレイヤーと敵とのヒット判定
                     var hitEnemyLogic = _playerLogic.FindHitTarget(_enemySpawnerLogic.ActiveEnemies);
@@ -330,7 +342,7 @@ namespace Game.UnityGameObject
                         }
 
                         hitBulletLogic.Destroy();
-                        enemyLogic.Destroy(); // 
+                        enemyLogic.Destroy(); // TODO: nn74: HP計算 
                         _enemySpawnerLogic.ActiveEnemies.Remove(enemyLogicNode);
                         _score += 100; // TODO: nn74: スコア計算
                     }
@@ -341,7 +353,7 @@ namespace Game.UnityGameObject
 
                 // Unity上の更新
                 scoreBoard.SetScore(_score);
-                worldRoot.UpdateStatus(_playerLogic);
+                worldRoot.UpdateStatus();
                 player.UpdateStatus();
                 foreach (var playerBullet in playerBulletCoordinator.Bullets)
                 {
@@ -373,6 +385,8 @@ namespace Game.UnityGameObject
         {
             token.ThrowIfCancellationRequested();
 
+            _worldRootLogic.SetTargetScale(WorldRootLogic.MaxScale);
+
             // メインループ
             while (true)
             {
@@ -391,10 +405,11 @@ namespace Game.UnityGameObject
                 while (_timer >= Defines.SecondsPerFrame)
                 {
                     _timer -= Defines.SecondsPerFrame;
+                    _worldRootLogic.UpdateStatus();
                 }
 
                 // Unity上の更新
-                worldRoot.UpdateStatus(_playerLogic);
+                worldRoot.UpdateStatus();
                 player.UpdateStatus();
 
                 // 次のフレームへ
