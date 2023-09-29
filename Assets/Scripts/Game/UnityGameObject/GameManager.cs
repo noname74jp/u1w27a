@@ -310,12 +310,28 @@ namespace Game.UnityGameObject
                     _playerBulletLogics.ForEach(logic => logic.UpdateStatus());
                     _enemySpawnerLogic.UpdateStatus(_playerLogic);
 
-                    // ヒット判定
-                    var hitEnemy = _playerLogic.FindHitTarget(_enemySpawnerLogic.ActiveEnemies);
-                    if (hitEnemy != null)
+                    // プレイヤーと敵とのヒット判定
+                    var hitEnemyLogic = _playerLogic.FindHitTarget(_enemySpawnerLogic.ActiveEnemies);
+                    if (hitEnemyLogic != null)
                     {
                         isGameOver = true;
                         break;
+                    }
+
+                    // 敵とプレイヤー弾とのヒット判定
+                    for (var enemyLogicNode = _enemySpawnerLogic.ActiveEnemies.First; enemyLogicNode != null; enemyLogicNode = enemyLogicNode.Next)
+                    {
+                        var enemyLogic = enemyLogicNode.Value;
+                        var hitBulletLogic = enemyLogic.FindHitTarget(_playerBulletLogics);
+                        if (hitBulletLogic == null)
+                        {
+                            continue;
+                        }
+
+                        hitBulletLogic.Destroy();
+                        enemyLogic.Destroy(); // 
+                        _enemySpawnerLogic.ActiveEnemies.Remove(enemyLogicNode);
+                        _score += 100; // TODO: nn74: スコア計算
                     }
 
                     // 生存ボーナス

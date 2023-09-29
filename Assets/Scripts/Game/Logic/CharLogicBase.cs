@@ -21,6 +21,13 @@ namespace Game.Logic
             // 距離の2乗がサイズの和の2乗以下ならヒット
             foreach (var logic in logics)
             {
+                // 生存していなければ次へ
+                if (!logic.Alive)
+                {
+                    continue;
+                }
+
+                // 距離の2乗でヒット判定
                 var totalSize = (_size + logic.Size) * 0.5f; // _sizeは直径で距離判定は半径のため0.5倍
                 var sqrMagnitude = (_location - logic.Location).sqrMagnitude;
                 if (sqrMagnitude <= totalSize * totalSize)
@@ -54,7 +61,7 @@ namespace Game.Logic
         /// <summary>
         /// 破棄する。
         /// </summary>
-        protected void Destroy()
+        public void Destroy()
         {
             _alive = false;
         }
