@@ -16,7 +16,7 @@ namespace Game.Logic
         /// <param name="velocity">初期速度。</param>
         public void Create(Vector2 location, Vector2 velocity)
         {
-            const float size = 10.5f;
+            const float size = 10.0f;
             base.Create(location, velocity, size);
         }
 

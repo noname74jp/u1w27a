@@ -44,7 +44,7 @@ namespace Game.UnityGameObject.Char
 
             var transformCache = transform;
             transformCache.localPosition = _logic.Location;
-            transformCache.localScale = Vector3.one * (_logic.Size * 60.0f / 52.0f);
+            transformCache.localScale = Vector3.one * (_logic.Size * 60.0f / 40.0f);
         }
 
         #endregion

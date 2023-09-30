@@ -39,7 +39,7 @@ namespace Game.Logic
         /// <summary>
         /// プレイヤーのサイズ[pixel]。
         /// </summary>
-        private const float PlayerSize = 21.0f;
+        private const float PlayerSize = 20.0f;
 
         /// <summary>
         /// グライド時の垂直方向の加速度[pixel/frame]。
