@@ -131,10 +131,13 @@ namespace Game.Logic
         /// </summary>
         /// <param name="isKeyPressed">キーが押されているか。</param>
         /// <param name="playerBulletLogics">弾配列。</param>
-        public void UpdateStatus(bool isKeyPressed, List<BulletLogic> playerBulletLogics)
+        /// <param name="jumped">ジャンプしたか。</param>
+        /// <param name="shooted">弾を撃ったか</param>
+        public void UpdateStatus(bool isKeyPressed, List<BulletLogic> playerBulletLogics, out bool jumped, out bool shooted)
         {
             // ジャンプ
-            if (isKeyPressed && !_wasKeyPressed)
+            jumped = isKeyPressed && !_wasKeyPressed;
+            if (jumped)
             {
                 _flipped = _flipped switch
                 {
@@ -183,7 +186,7 @@ namespace Game.Logic
             }
 
             // 弾を撃つ
-            Shoot(playerBulletLogics);
+            shooted = Shoot(playerBulletLogics);
         }
 
         /// <summary>
@@ -216,23 +219,25 @@ namespace Game.Logic
         /// 弾を撃つ
         /// </summary>
         /// <param name="playerBulletLogics">弾配列。</param>
-        private void Shoot(List<BulletLogic> playerBulletLogics)
+        /// <returns>弾を撃ったらtrue、打たなかったらfalse。</returns>
+        private bool Shoot(IEnumerable<BulletLogic> playerBulletLogics)
         {
             _remainAttackInterval--;
             if (_remainAttackInterval > 0)
             {
-                return;
+                return false;
             }
 
             _remainAttackInterval = AttackInterval;
             var bulletLogic = playerBulletLogics.FirstOrDefault(logic => !logic.Alive);
             if (bulletLogic == null)
             {
-                return;
+                return false;
             }
 
             Vector2 bulletVelocity = new(_flipped ? -BulletVelocityX : BulletVelocityX, 0.0f);
             bulletLogic.Create(_location, bulletVelocity);
+            return true;
         }
 
         #endregion

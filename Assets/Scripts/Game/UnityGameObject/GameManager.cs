@@ -87,12 +87,32 @@ namespace Game.UnityGameObject
             /// <summary>
             /// BGM。
             /// </summary>
-            [SerializeField] public AudioSource Bgm;
+            [SerializeField] public AudioSource bgm;
 
             /// <summary>
             /// 環境音。
             /// </summary>
-            [SerializeField] public AudioSource Ambience;
+            [SerializeField] public AudioSource ambience;
+
+            /// <summary>
+            /// ゲームオーバー。
+            /// </summary>
+            [SerializeField] public AudioSource gameOver;
+
+            /// <summary>
+            /// ジャンプ。
+            /// </summary>
+            [SerializeField] public AudioSource jump;
+
+            /// <summary>
+            /// ショット。
+            /// </summary>
+            [SerializeField] public AudioSource shot;
+
+            /// <summary>
+            /// ヒット。
+            /// </summary>
+            [SerializeField] public AudioSource hit;
         }
 
         #endregion
@@ -356,7 +376,7 @@ namespace Game.UnityGameObject
             token.ThrowIfCancellationRequested();
 
             _worldRootLogic.SetTargetScale(WorldRootLogic.MinScale);
-            sound.Bgm.Play();
+            sound.bgm.Play();
 
             // メインループ
             while (true)
@@ -373,6 +393,9 @@ namespace Game.UnityGameObject
                 }
 
                 // ロジックの更新
+                var needPlayJumpSe = false;
+                var needPlayShootSe = false;
+                var needPlayHitSe = false;
                 var isGameOver = false;
                 _timer += Time.deltaTime;
                 while (_timer >= Defines.SecondsPerFrame)
@@ -380,7 +403,9 @@ namespace Game.UnityGameObject
                     _timer -= Defines.SecondsPerFrame;
 
                     // 状態を更新
-                    _playerLogic.UpdateStatus(isDecideKeyPressed, _playerBulletLogics);
+                    _playerLogic.UpdateStatus(isDecideKeyPressed, _playerBulletLogics, out var jumped, out var shooted);
+                    needPlayJumpSe |= jumped;
+                    needPlayShootSe |= shooted;
                     _playerBulletLogics.ForEach(logic => logic.UpdateStatus());
                     _enemySpawnerLogic.UpdateStatus(_playerLogic);
                     _worldRootLogic.UpdateStatus();
@@ -407,6 +432,7 @@ namespace Game.UnityGameObject
                         enemyLogic.Destroy(); // TODO: nn74: HP計算 
                         _enemySpawnerLogic.ActiveEnemies.Remove(enemyLogicNode);
                         _score += 100; // TODO: nn74: スコア計算
+                        needPlayHitSe = true;
                     }
 
                     // 生存ボーナス
@@ -434,11 +460,27 @@ namespace Game.UnityGameObject
                     break;
                 }
 
+                // SE再生
+                if (needPlayJumpSe)
+                {
+                    sound.jump.Play();
+                }
+
+                if (needPlayShootSe)
+                {
+                    sound.shot.Play();
+                }
+
+                if (needPlayHitSe)
+                {
+                    sound.hit.Play();
+                }
+
                 // 次のフレームへ
                 await UniTask.NextFrame(token);
             }
 
-            sound.Bgm.Stop();
+            sound.bgm.Stop();
         }
 
         /// <summary>
@@ -450,6 +492,7 @@ namespace Game.UnityGameObject
             token.ThrowIfCancellationRequested();
 
             _worldRootLogic.SetTargetScale(WorldRootLogic.MaxScale);
+            sound.gameOver.Play();
 
             // メインループ
             while (true)
