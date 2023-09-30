@@ -8,6 +8,7 @@ using Game.UnityGameObject.UI;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
+using unityroom.Api;
 
 namespace Game.UnityGameObject
 {
@@ -465,6 +466,7 @@ namespace Game.UnityGameObject
             sound.bgm.Play();
 
             // メインループ
+            var frameCount = 0;
             while (true)
             {
                 // 入力管理
@@ -474,6 +476,7 @@ namespace Game.UnityGameObject
                 // リトライ
                 if (isRetryKeyPressed)
                 {
+                    UnityroomApiClient.Instance.SendScore(1, _score, ScoreboardWriteMode.HighScoreDesc);
                     UpdateTitle(token).Forget();
                     break;
                 }
@@ -487,6 +490,7 @@ namespace Game.UnityGameObject
                 while (_timer >= Defines.SecondsPerFrame)
                 {
                     _timer -= Defines.SecondsPerFrame;
+                    frameCount++;
 
                     // 状態を更新
                     _playerLogic.UpdateStatus(isDecideKeyPressed, _playerBulletLogics, out var jumped, out var shooted);
@@ -501,6 +505,7 @@ namespace Game.UnityGameObject
                     if (hitEnemyLogic != null)
                     {
                         isGameOver = true;
+                        UnityroomApiClient.Instance.SendScore(1, _score, ScoreboardWriteMode.HighScoreDesc);
                         break;
                     }
 
@@ -523,6 +528,12 @@ namespace Game.UnityGameObject
 
                     // 生存ボーナス
                     _score++; // TODO: nn74: スコア計算
+
+                    // 定期的にハイスコア送信
+                    if (frameCount % Mathf.RoundToInt((float)(Defines.FramePerSec * 15.0)) == 0)
+                    {
+                        UnityroomApiClient.Instance.SendScore(1, _score, ScoreboardWriteMode.HighScoreDesc);
+                    }
                 }
 
                 // Unity上の更新
@@ -542,6 +553,7 @@ namespace Game.UnityGameObject
                 // プレイヤーが死んでいたら抜ける
                 if (isGameOver)
                 {
+                    UnityroomApiClient.Instance.SendScore(1, _score, ScoreboardWriteMode.HighScoreDesc);
                     UpdateGameOver(token).Forget();
                     break;
                 }
