@@ -153,7 +153,7 @@ namespace Game.Logic
             _verticalAcceleration = VerticalAccelerationAtFall;
             _flipped = false;
             _wasKeyPressed = false;
-            _shootType = ShootType.ThreeWayB;
+            _shootType = ShootType.RapidShot;
             _remainAttackInterval = AttackInterval;
         }
 
@@ -170,6 +170,7 @@ namespace Game.Logic
             jumped = isKeyPressed && !_wasKeyPressed;
             if (jumped)
             {
+                var previousFlipped = _flipped;
                 _flipped = _flipped switch
                 {
                     // 折り返し点を越えていたら反転
@@ -182,13 +183,10 @@ namespace Game.Logic
                 _velocity = new Vector2(_flipped ? -HorizontalVelocityInGlide : HorizontalVelocityInGlide, VerticalInitialVelocity);
 
                 // 攻撃切り替え
-                _shootType = _shootType switch
+                if (_flipped != previousFlipped)
                 {
-                    ShootType.RapidShot => ShootType.ThreeWayA,
-                    ShootType.ThreeWayA => ShootType.ThreeWayB,
-                    ShootType.ThreeWayB => ShootType.RapidShot,
-                    _ => _shootType
-                };
+                    ChangeShootType();
+                }
             }
 
             // キーの押下状態を更新
@@ -209,10 +207,12 @@ namespace Game.Logic
             if (_location.x < LocationRect.xMin)
             {
                 FlipX(LocationRect.xMin);
+                ChangeShootType();
             }
             else if (_location.x > LocationRect.xMax)
             {
                 FlipX(LocationRect.xMax);
+                ChangeShootType();
             }
 
             // y方向の領域を越えた場合
@@ -253,6 +253,20 @@ namespace Game.Logic
             {
                 _velocity.y = 0.0f;
             }
+        }
+
+        /// <summary>
+        /// 攻撃を切り替える。
+        /// </summary>
+        private void ChangeShootType()
+        {
+            _shootType = _shootType switch
+            {
+                ShootType.RapidShot => ShootType.ThreeWayA,
+                ShootType.ThreeWayA => ShootType.ThreeWayB,
+                ShootType.ThreeWayB => ShootType.RapidShot,
+                _ => _shootType
+            };
         }
 
         /// <summary>
