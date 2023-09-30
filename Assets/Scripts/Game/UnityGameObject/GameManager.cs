@@ -112,6 +112,11 @@ namespace Game.UnityGameObject
         [SerializeField] private TitleLogo titleLogo;
 
         /// <summary>
+        /// ライセンスウィンドウ。
+        /// </summary>
+        [SerializeField] private LicensesWindow licencesWindow;
+
+        /// <summary>
         /// ワールドのルートのオブジェクト。
         /// </summary>
         [SerializeField] private WorldRoot worldRoot;
@@ -261,6 +266,9 @@ namespace Game.UnityGameObject
             _worldRootLogic = new WorldRootLogic(_playerLogic);
             worldRoot.Initialize(_worldRootLogic);
             scoreBoard.SetScore(_score);
+
+            titleLogo.gameObject.SetActive(false);
+            licencesWindow.gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -275,6 +283,9 @@ namespace Game.UnityGameObject
             Initialize();
             titleLogo.gameObject.SetActive(true);
 
+            // リトライキーが押されていたら待つ
+            await UniTask.WaitWhile(() => inputActionData.IsRetryKeyPressed(), cancellationToken: token);
+
             // メインループ
             while (true)
             {
@@ -284,6 +295,12 @@ namespace Game.UnityGameObject
                     break;
                 }
 
+                // ライセンス
+                if (inputActionData.IsRetryKeyPressed())
+                {
+                    await UpdateLicenseWindow(token);
+                }
+
                 // 次のフレームへ
                 await UniTask.NextFrame(token);
             }
@@ -291,6 +308,21 @@ namespace Game.UnityGameObject
             // タイトル終了処理
             titleLogo.gameObject.SetActive(false);
             UpdateGame(token).Forget();
+        }
+
+        /// <summary>
+        /// ライセンスウィンドウを更新する。
+        /// </summary>
+        /// <param name="token">キャンセルトークン。</param>
+        private async UniTask UpdateLicenseWindow(CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+
+            licencesWindow.gameObject.SetActive(true);
+            await UniTask.WaitWhile(() => inputActionData.IsRetryKeyPressed(), cancellationToken: token);
+            await UniTask.WaitWhile(() => !inputActionData.IsRetryKeyPressed(), cancellationToken: token);
+            await UniTask.WaitWhile(() => inputActionData.IsRetryKeyPressed(), cancellationToken: token);
+            licencesWindow.gameObject.SetActive(false);
         }
 
         /// <summary>

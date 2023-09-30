@@ -74,3 +74,7 @@ crashlytics-build.properties
 
 # User Customs
 /_Rom/
+/Assets/Arts/Fonts/
+/Assets/Arts/Fonts.meta
+/Assets/TextMesh Pro/
+/Assets/TextMesh Pro.meta
