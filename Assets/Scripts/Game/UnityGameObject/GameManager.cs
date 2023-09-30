@@ -107,6 +107,11 @@ namespace Game.UnityGameObject
         [SerializeField] private ScoreBoard scoreBoard;
 
         /// <summary>
+        /// タイトルロゴ。
+        /// </summary>
+        [SerializeField] private TitleLogo titleLogo;
+
+        /// <summary>
         /// ワールドのルートのオブジェクト。
         /// </summary>
         [SerializeField] private WorldRoot worldRoot;
@@ -268,6 +273,7 @@ namespace Game.UnityGameObject
 
             // 初期化
             Initialize();
+            titleLogo.gameObject.SetActive(true);
 
             // メインループ
             while (true)
@@ -283,6 +289,7 @@ namespace Game.UnityGameObject
             }
 
             // タイトル終了処理
+            titleLogo.gameObject.SetActive(false);
             UpdateGame(token).Forget();
         }
 

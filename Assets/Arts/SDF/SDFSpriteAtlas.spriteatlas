@@ -52,18 +52,24 @@ SpriteAtlas:
   m_PackedSprites:
   - {fileID: 21300000, guid: e8c01950d2bec48ea89af342994eba7c, type: 3}
   - {fileID: 21300000, guid: e436f6705098b423b9bdf0a60694259c, type: 3}
+  - {fileID: 21300000, guid: 7e2c0d314c7734320a3babe7d47dda1b, type: 3}
+  - {fileID: 21300000, guid: a4f14602b69e1466fa30ce403cda5a79, type: 3}
   - {fileID: 21300000, guid: f9f331128e54e4f06bc7e20fc6b06a23, type: 3}
+  - {fileID: 21300000, guid: fba4d542c54594cf5a851def965ef78b, type: 3}
   - {fileID: 21300000, guid: 7db982725b5194a5994587a424fd84f0, type: 3}
   - {fileID: 21300000, guid: 937aa8b2a37bd4216b5a8b7b385102d3, type: 3}
   - {fileID: 21300000, guid: b5d2eab2f6c2047b6ab9a144a8436981, type: 3}
   - {fileID: 21300000, guid: 8675ad14351e3469fb2dd3375090a7a5, type: 3}
+  - {fileID: 21300000, guid: 74051f15b4d974b92bc6cdf39abff050, type: 3}
   - {fileID: 21300000, guid: 33ee3ae5f3eb84549af177130e71c594, type: 3}
+  - {fileID: 21300000, guid: 415b2af66cd934cfda1a802ad5894e4c, type: 3}
   - {fileID: 21300000, guid: 06cdae074b53c46fea284ad29b636cdd, type: 3}
   - {fileID: 21300000, guid: eb04f41843b064c519ba58bf364f22d4, type: 3}
   - {fileID: 21300000, guid: 2c6456294b54b4a05bbec0740078a50c, type: 3}
   - {fileID: 21300000, guid: 4f57e3390797340e09c5025c2465b5ad, type: 3}
   - {fileID: 21300000, guid: 1cc8c7aa7decb4d8cab51a186713a299, type: 3}
   - {fileID: 21300000, guid: 12fd203b40e774b248286b4098b3cfc6, type: 3}
+  - {fileID: 21300000, guid: afe1ad6ba6dff4cbb91584d8756274f5, type: 3}
   - {fileID: 21300000, guid: 4dbb159b741f14bbcbb1522b927f9ea9, type: 3}
   - {fileID: 21300000, guid: e106cfeb98310465183fbe2eef80487a, type: 3}
   - {fileID: 21300000, guid: 5589e21cca42843509601daed2d07e8a, type: 3}
@@ -75,18 +81,24 @@ SpriteAtlas:
   m_PackedSpriteNamesToIndex:
   - 0x83ef
   - 0xff13
+  - 0x5411
+  - 0x98db
   - 0xff16
+  - 0x4e86
   - 0xff15
   - 0xff10
   - 0xff14
   - 0x70b9
+  - 0x5c0f
   - 0xff19
+  - 0x9ce5
   - 0x25cf
   - 0x8349
   - 0xff12
   - 0x9e1e
   - 0x96db
   - 0x5730
+  - 0x85cd
   - t
   - 0x5929
   - x
