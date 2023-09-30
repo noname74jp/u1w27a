@@ -9,6 +9,31 @@ namespace Game.Logic
     /// </summary>
     public class PlayerLogic : CharLogicBase
     {
+        #region enums
+
+        /// <summary>
+        /// 攻撃タイプ。
+        /// </summary>
+        private enum ShootType
+        {
+            /// <summary>
+            /// 前方に速射。
+            /// </summary>
+            RapidShot,
+
+            /// <summary>
+            /// 斜め前方に3way。
+            /// </summary>
+            ThreeWayA,
+
+            /// <summary>
+            /// 前上下に3way。
+            /// </summary>
+            ThreeWayB
+        }
+
+        #endregion
+
         #region constants
 
         /// <summary>
@@ -110,6 +135,11 @@ namespace Game.Logic
         /// </summary>
         private int _remainAttackInterval;
 
+        /// <summary>
+        /// 攻撃種類。
+        /// </summary>
+        private ShootType _shootType;
+
         #endregion
 
         #region methods
@@ -123,6 +153,7 @@ namespace Game.Logic
             _verticalAcceleration = VerticalAccelerationAtFall;
             _flipped = false;
             _wasKeyPressed = false;
+            _shootType = ShootType.ThreeWayB;
             _remainAttackInterval = AttackInterval;
         }
 
@@ -149,6 +180,15 @@ namespace Game.Logic
 
                 // 速度を設定
                 _velocity = new Vector2(_flipped ? -HorizontalVelocityInGlide : HorizontalVelocityInGlide, VerticalInitialVelocity);
+
+                // 攻撃切り替え
+                _shootType = _shootType switch
+                {
+                    ShootType.RapidShot => ShootType.ThreeWayA,
+                    ShootType.ThreeWayA => ShootType.ThreeWayB,
+                    ShootType.ThreeWayB => ShootType.RapidShot,
+                    _ => _shootType
+                };
             }
 
             // キーの押下状態を更新
@@ -220,7 +260,7 @@ namespace Game.Logic
         /// </summary>
         /// <param name="playerBulletLogics">弾配列。</param>
         /// <returns>弾を撃ったらtrue、打たなかったらfalse。</returns>
-        private bool Shoot(IEnumerable<BulletLogic> playerBulletLogics)
+        private bool Shoot(List<BulletLogic> playerBulletLogics)
         {
             _remainAttackInterval--;
             if (_remainAttackInterval > 0)
@@ -228,14 +268,74 @@ namespace Game.Logic
                 return false;
             }
 
-            _remainAttackInterval = AttackInterval;
+            switch (_shootType)
+            {
+                case ShootType.RapidShot:
+                {
+                    _remainAttackInterval = AttackInterval;
+                    Vector2 bulletVelocity = new(_flipped ? -BulletVelocityX : BulletVelocityX, 0.0f);
+                    return Shoot(playerBulletLogics, bulletVelocity);
+                }
+                case ShootType.ThreeWayA:
+                {
+                    _remainAttackInterval = AttackInterval * 3;
+
+                    Vector2 bulletVelocity = new(_flipped ? -BulletVelocityX : BulletVelocityX, 0.0f);
+                    if (!Shoot(playerBulletLogics, bulletVelocity))
+                    {
+                        return false;
+                    }
+
+                    bulletVelocity.y = BulletVelocityX;
+                    if (!Shoot(playerBulletLogics, bulletVelocity))
+                    {
+                        return true;
+                    }
+
+                    bulletVelocity.y = -BulletVelocityX;
+                    Shoot(playerBulletLogics, bulletVelocity);
+                    return true;
+                }
+                case ShootType.ThreeWayB:
+                {
+                    _remainAttackInterval = AttackInterval * 3;
+
+                    Vector2 bulletVelocity = new(_flipped ? -BulletVelocityX : BulletVelocityX, 0.0f);
+                    if (!Shoot(playerBulletLogics, bulletVelocity))
+                    {
+                        return false;
+                    }
+
+                    bulletVelocity.x = 0.0f;
+                    bulletVelocity.y = BulletVelocityX;
+                    if (!Shoot(playerBulletLogics, bulletVelocity))
+                    {
+                        return true;
+                    }
+
+                    bulletVelocity.y = -BulletVelocityX;
+                    Shoot(playerBulletLogics, bulletVelocity);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 弾を撃つ
+        /// </summary>
+        /// <param name="playerBulletLogics">弾配列。</param>
+        /// <param name="bulletVelocity">弾速。</param>
+        /// <returns>弾を撃ったらtrue、打たなかったらfalse。</returns>
+        private bool Shoot(IEnumerable<BulletLogic> playerBulletLogics, Vector2 bulletVelocity)
+        {
             var bulletLogic = playerBulletLogics.FirstOrDefault(logic => !logic.Alive);
             if (bulletLogic == null)
             {
                 return false;
             }
 
-            Vector2 bulletVelocity = new(_flipped ? -BulletVelocityX : BulletVelocityX, 0.0f);
             bulletLogic.Create(_location, bulletVelocity);
             return true;
         }
