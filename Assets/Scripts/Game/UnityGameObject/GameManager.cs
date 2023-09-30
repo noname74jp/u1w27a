@@ -6,6 +6,7 @@ using Game.Logic;
 using Game.UnityGameObject.Char;
 using Game.UnityGameObject.UI;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.InputSystem;
 
 namespace Game.UnityGameObject
@@ -28,12 +29,22 @@ namespace Game.UnityGameObject
             /// <summary>
             /// 決定。
             /// </summary>
-            [SerializeField] public InputAction decide;
+            [SerializeField] private InputAction decide;
 
             /// <summary>
             /// リトライ。
             /// </summary>
-            [SerializeField] public InputAction retry;
+            [SerializeField] private InputAction retry;
+
+            /// <summary>
+            /// 音量アップ。
+            /// </summary>
+            [SerializeField] private InputAction volumeUp;
+
+            /// <summary>
+            /// 音量ダウン。
+            /// </summary>
+            [SerializeField] private InputAction volumeDown;
 
             #endregion
 
@@ -46,6 +57,8 @@ namespace Game.UnityGameObject
             {
                 decide.Enable();
                 retry.Enable();
+                volumeUp.Enable();
+                volumeDown.Enable();
             }
 
             /// <summary>
@@ -55,24 +68,45 @@ namespace Game.UnityGameObject
             {
                 decide.Disable();
                 retry.Disable();
+                volumeUp.Disable();
+                volumeDown.Disable();
             }
 
             /// <summary>
             /// 決定ボタンが押されているか。
             /// </summary>
-            /// <returns></returns>
+            /// <returns>ボタンが押されていればtrue。</returns>
             public bool IsDecideKeyPressed()
             {
-                return decide.ReadValue<float>() >= 0.5f;
+                return decide.IsPressed();
             }
 
             /// <summary>
             /// リトライボタンが押されているか。
             /// </summary>
-            /// <returns></returns>
+            /// <returns>ボタンが押されていればtrue。</returns>
             public bool IsRetryKeyPressed()
             {
-                return retry.ReadValue<float>() >= 0.5f;
+                return retry.IsPressed();
+            }
+
+            /// <summary>
+            /// 音量アップ/ダウンボタンが押されているか。
+            /// </summary>
+            /// <returns>音量ボタンが押されていれば1、音量ダウンボタンが押されていれば-1、どちらも押されていなければ0。</returns>
+            public float GetVolumeUpDownValue()
+            {
+                if (volumeUp.triggered)
+                {
+                    return 1.0f;
+                }
+
+                if (volumeDown.triggered)
+                {
+                    return -1.0f;
+                }
+
+                return 0.0f;
             }
 
             #endregion
@@ -85,19 +119,29 @@ namespace Game.UnityGameObject
         private class Sound
         {
             /// <summary>
-            /// BGM。
-            /// </summary>
-            [SerializeField] public AudioSource bgm;
-
-            /// <summary>
             /// 環境音。
             /// </summary>
             [SerializeField] public AudioSource ambience;
 
             /// <summary>
+            /// オーディオミキサー。
+            /// </summary>
+            [SerializeField] public AudioMixer audioMixer;
+
+            /// <summary>
+            /// BGM。
+            /// </summary>
+            [SerializeField] public AudioSource bgm;
+
+            /// <summary>
             /// ゲームオーバー。
             /// </summary>
             [SerializeField] public AudioSource gameOver;
+
+            /// <summary>
+            /// ヒット。
+            /// </summary>
+            [SerializeField] public AudioSource hit;
 
             /// <summary>
             /// ジャンプ。
@@ -108,11 +152,6 @@ namespace Game.UnityGameObject
             /// ショット。
             /// </summary>
             [SerializeField] public AudioSource shot;
-
-            /// <summary>
-            /// ヒット。
-            /// </summary>
-            [SerializeField] public AudioSource hit;
         }
 
         #endregion
@@ -266,6 +305,7 @@ namespace Game.UnityGameObject
         {
             _cts = new CancellationTokenSource();
             UpdateTitle(_cts.Token).Forget();
+            UpdateVolumeController(_cts.Token).Forget();
         }
 
         /// <summary>
@@ -311,6 +351,52 @@ namespace Game.UnityGameObject
 
             titleLogo.gameObject.SetActive(false);
             licencesWindow.gameObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// 音量制御を更新する。
+        /// </summary>
+        /// <param name="token">キャンセルトークン。</param>
+        private async UniTaskVoid UpdateVolumeController(CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            await UniTask.NextFrame(token);
+
+            const float maxVolume = 10.0f;
+            var volume = 7.0f;
+            sound.audioMixer.SetFloat("MasterVolume", ConvertVolumeToDB(volume / maxVolume));
+
+            // メインループ
+            var previousDeltaVolume = 0.0f;
+            while (true)
+            {
+                // 音量を設定
+                var deltaVolume = inputActionData.GetVolumeUpDownValue();
+                if (Math.Abs(previousDeltaVolume - deltaVolume) > 0.0f)
+                {
+                    var previousVolume = volume;
+                    volume = Mathf.Clamp(volume + deltaVolume, 0.0f, maxVolume);
+                    if (Math.Abs(previousVolume - volume) > 0.0f)
+                    {
+                        sound.audioMixer.SetFloat("MasterVolume", ConvertVolumeToDB(volume / maxVolume));
+                    }
+                }
+
+                previousDeltaVolume = deltaVolume;
+
+                // 次のフレームへ
+                await UniTask.NextFrame(token);
+            }
+        }
+
+        /// <summary>
+        /// ボリュームをdbに変換する。
+        /// </summary>
+        /// <param name="volume">ボリューム(0.0〜1.0)。</param>
+        /// <returns>dB(-80〜0)。</returns>
+        private float ConvertVolumeToDB(float volume)
+        {
+            return Mathf.Clamp(20f * Mathf.Log10(Mathf.Clamp01(volume)), -80f, 0f);
         }
 
         /// <summary>
