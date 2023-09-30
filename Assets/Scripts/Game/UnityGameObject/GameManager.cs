@@ -78,6 +78,23 @@ namespace Game.UnityGameObject
             #endregion
         }
 
+        /// <summary>
+        /// サウンド。
+        /// </summary>
+        [Serializable]
+        private class Sound
+        {
+            /// <summary>
+            /// BGM。
+            /// </summary>
+            [SerializeField] public AudioSource Bgm;
+
+            /// <summary>
+            /// 環境音。
+            /// </summary>
+            [SerializeField] public AudioSource Ambience;
+        }
+
         #endregion
 
         #region constants
@@ -100,6 +117,11 @@ namespace Game.UnityGameObject
         /// 入力アクションデータ。
         /// </summary>
         [SerializeField] private InputActionData inputActionData;
+
+        /// <summary>
+        /// サウンド。
+        /// </summary>
+        [SerializeField] private Sound sound;
 
         /// <summary>
         /// スコアボード。
@@ -334,6 +356,7 @@ namespace Game.UnityGameObject
             token.ThrowIfCancellationRequested();
 
             _worldRootLogic.SetTargetScale(WorldRootLogic.MinScale);
+            sound.Bgm.Play();
 
             // メインループ
             while (true)
@@ -408,12 +431,14 @@ namespace Game.UnityGameObject
                 if (isGameOver)
                 {
                     UpdateGameOver(token).Forget();
-                    return;
+                    break;
                 }
 
                 // 次のフレームへ
                 await UniTask.NextFrame(token);
             }
+
+            sound.Bgm.Stop();
         }
 
         /// <summary>
