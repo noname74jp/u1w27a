@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
 using unityroom.Api;
+using Random = UnityEngine.Random;
 
 namespace Game.UnityGameObject
 {
@@ -562,16 +563,19 @@ namespace Game.UnityGameObject
                 if (needPlayJumpSe)
                 {
                     sound.jump.Play();
+                    sound.jump.pitch = Random.Range(1.0f, 1.2f);
                 }
 
                 if (needPlayShootSe)
                 {
                     sound.shot.Play();
+                    sound.shot.pitch = Random.Range(1.0f, 1.2f);
                 }
 
                 if (needPlayHitSe)
                 {
                     sound.hit.Play();
+                    sound.hit.pitch = Random.Range(1.0f, 1.2f);
                 }
 
                 // 次のフレームへ
