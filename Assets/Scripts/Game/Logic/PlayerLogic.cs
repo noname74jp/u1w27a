@@ -167,7 +167,7 @@ namespace Game.Logic
         public void UpdateStatus(bool isKeyPressed, List<BulletLogic> playerBulletLogics, out bool jumped, out bool shooted)
         {
             // ジャンプ
-            jumped = isKeyPressed && !_wasKeyPressed;
+            jumped = !isKeyPressed && _wasKeyPressed;
             if (jumped)
             {
                 var previousFlipped = _flipped;
@@ -180,7 +180,7 @@ namespace Game.Logic
                 };
 
                 // 速度を設定
-                _velocity = new Vector2(_flipped ? -HorizontalVelocityInGlide : HorizontalVelocityInGlide, VerticalInitialVelocity);
+                _velocity = new Vector2(_flipped ? -HorizontalVelocityAtFall : HorizontalVelocityAtFall, VerticalInitialVelocity);
 
                 // 攻撃切り替え
                 if (_flipped != previousFlipped)
@@ -198,7 +198,7 @@ namespace Game.Logic
             // 速度を更新
             var previousVelocity = _velocity;
             _velocity.x = (_flipped ? -1 : 1) * (isKeyPressed ? HorizontalVelocityInGlide : HorizontalVelocityAtFall);
-            _velocity.y = Mathf.Clamp(_velocity.y + _verticalAcceleration, VerticalMinVelocity, VerticalMaxVelocity);
+            _velocity.y = isKeyPressed ? 0.0f : Mathf.Clamp(_velocity.y + _verticalAcceleration, VerticalMinVelocity, VerticalMaxVelocity);
 
             // 位置を更新
             _location += (_velocity + previousVelocity) * 0.5f;
@@ -206,53 +206,30 @@ namespace Game.Logic
             // x方向の領域を越えた場合
             if (_location.x < LocationRect.xMin)
             {
-                FlipX(LocationRect.xMin);
-                ChangeShootType();
+                _location.x = LocationRect.xMin;
             }
             else if (_location.x > LocationRect.xMax)
             {
-                FlipX(LocationRect.xMax);
-                ChangeShootType();
+                _location.x = LocationRect.xMax;
             }
 
             // y方向の領域を越えた場合
             if (_location.y < LocationRect.yMin)
             {
-                FlipY(LocationRect.yMin, isKeyPressed);
+                _location.y = LocationRect.yMin;
+                _velocity.y *= -CoefficientOfRestitution;
+                if (Mathf.Abs(_velocity.y) < VerticalRoundToZeroVelocity)
+                {
+                    _velocity.y = 0.0f;
+                }
             }
             else if (_location.y > LocationRect.yMax)
             {
-                FlipY(LocationRect.yMax, isKeyPressed);
+                _location.y = LocationRect.yMax;
             }
 
             // 弾を撃つ
             shooted = Shoot(playerBulletLogics);
-        }
-
-        /// <summary>
-        /// x方向の向きを反転する。
-        /// </summary>
-        /// <param name="locationX">反転時のx座標。</param>
-        private void FlipX(float locationX)
-        {
-            _location.x = locationX;
-            _velocity.x *= -1.0f;
-            _flipped = !_flipped;
-        }
-
-        /// <summary>
-        /// y方向の向きを反転する。
-        /// </summary>
-        /// <param name="locationY">反転時のy座標。</param>
-        /// <param name="isKeyPressed">キーが押されているか。</param>
-        private void FlipY(float locationY, bool isKeyPressed)
-        {
-            _location.y = locationY;
-            _velocity.y *= isKeyPressed ? 0.0f : -CoefficientOfRestitution;
-            if (Mathf.Abs(_velocity.y) < VerticalRoundToZeroVelocity)
-            {
-                _velocity.y = 0.0f;
-            }
         }
 
         /// <summary>
