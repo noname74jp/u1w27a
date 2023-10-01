@@ -101,9 +101,7 @@ namespace Game.Logic
 
             // 敵を生成
             var enemy = ActivateEnemy();
-            var x = Random.Range(0, 2) == 0 ? -480.0f : 480.0f;
-            var y = Random.Range(-222.0f, 222.0f);
-            var location = new Vector2(x, y);
+            var location = GetRandomSpawnLocation(false, true);
             enemy.Create(EnemyLogic.EnemyType.Club01, location, playerLogic);
         }
 
@@ -123,9 +121,7 @@ namespace Game.Logic
 
             // 敵を生成
             var enemy = ActivateEnemy();
-            var x = Random.Range(-440.0f, 440.0f);
-            var y = Random.Range(0, 2) == 0 ? -262.0f : 262.0f;
-            var location = new Vector2(x, y);
+            var location = GetRandomSpawnLocation(true, false);
             enemy.Create(EnemyLogic.EnemyType.Diamond01, location, playerLogic);
         }
 
@@ -145,9 +141,7 @@ namespace Game.Logic
 
             // 敵を生成
             var enemy = ActivateEnemy();
-            var x = Random.Range(-440.0f, 440.0f);
-            var y = Random.Range(0, 2) == 0 ? -262.0f : 262.0f;
-            var location = new Vector2(x, y);
+            var location = GetRandomSpawnLocation(true, true);
             enemy.Create(EnemyLogic.EnemyType.Heart01, location, playerLogic);
         }
 
@@ -167,9 +161,7 @@ namespace Game.Logic
 
             // 敵を生成
             var enemy = ActivateEnemy();
-            var x = Random.Range(-440.0f, 440.0f);
-            var y = Random.Range(0, 2) == 0 ? -262.0f : 262.0f;
-            var location = new Vector2(x, y);
+            var location = GetRandomSpawnLocation(true, true);
             enemy.Create(EnemyLogic.EnemyType.Spade01, location, playerLogic);
         }
 
@@ -189,10 +181,39 @@ namespace Game.Logic
 
             // 敵を生成
             var enemy = ActivateEnemy();
-            var x = Random.Range(-440.0f, 440.0f);
-            var y = Random.Range(0, 2) == 0 ? -262.0f : 262.0f;
-            var location = new Vector2(x, y);
+            var location = GetRandomSpawnLocation(true, false);
             enemy.Create(EnemyLogic.EnemyType.Joker, location, playerLogic);
+        }
+
+        /// <summary>
+        /// ランダムな生成位置を取得。
+        /// </summary>
+        /// <param name="enableTopBottom">上下に出現可能か。</param>
+        /// <param name="enableLeftRight">左右に出現可能か。</param>
+        /// <returns>生成位置。</returns>
+        private Vector2 GetRandomSpawnLocation(bool enableTopBottom, bool enableLeftRight)
+        {
+            var random03 = Random.Range(0, 4);
+
+            // 上下か左右かを抽選。
+            var isTopBottom = (random03 & 0x02) == 0;
+            isTopBottom &= enableTopBottom;
+            isTopBottom |= !enableLeftRight;
+
+            // 上下のどちらかに生成
+            if (isTopBottom)
+            {
+                var x = Random.Range(-440.0f, 440.0f);
+                var y = (random03 & 0x01) == 0 ? -270.0f : 270.0f;
+                return new Vector2(x, y);
+            }
+            // 左右のどちらかに生成
+            else
+            {
+                var x = Random.Range(0, 2) == 0 ? -480.0f : 480.0f;
+                var y = Random.Range(-222.0f, 222.0f);
+                return new Vector2(x, y);
+            }
         }
 
         private EnemyLogic ActivateEnemy()
