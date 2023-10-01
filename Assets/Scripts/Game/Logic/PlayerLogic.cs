@@ -94,7 +94,7 @@ namespace Game.Logic
         /// <summary>
         /// 攻撃のインターバル[frame]。
         /// </summary>
-        private const int AttackInterval = (int)(Defines.FramePerSec * 5.0 / 60.0);
+        private const int AttackInterval = (int)(Defines.FramePerSec * 8.0 / 60.0);
 
         /// <summary>
         /// 弾の速度[pixel/frame]
