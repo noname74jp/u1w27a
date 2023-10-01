@@ -163,7 +163,7 @@ namespace Game.UnityGameObject
         /// <summary>
         /// プレイヤーの弾数。
         /// </summary>
-        private const int PlayerBulletCount = 32;
+        private const int PlayerBulletCount = 60;
 
         /// <summary>
         /// 敵数。
@@ -396,7 +396,7 @@ namespace Game.UnityGameObject
         /// </summary>
         /// <param name="volume">ボリューム(0.0〜1.0)。</param>
         /// <returns>dB(-80〜0)。</returns>
-        private float ConvertVolumeToDB(float volume)
+        private static float ConvertVolumeToDB(float volume)
         {
             return Mathf.Clamp(20f * Mathf.Log10(Mathf.Clamp01(volume)), -80f, 0f);
         }
@@ -494,9 +494,9 @@ namespace Game.UnityGameObject
                     frameCount++;
 
                     // 状態を更新
-                    _playerLogic.UpdateStatus(isDecideKeyPressed, _playerBulletLogics, out var jumped, out var shooted);
+                    _playerLogic.UpdateStatus(isDecideKeyPressed, _playerBulletLogics, out var jumped, out var shot);
                     needPlayJumpSe |= jumped;
-                    needPlayShootSe |= shooted;
+                    needPlayShootSe |= shot;
                     _playerBulletLogics.ForEach(logic => logic.UpdateStatus());
                     _enemySpawnerLogic.UpdateStatus(_playerLogic);
                     _worldRootLogic.UpdateStatus();
@@ -521,9 +521,17 @@ namespace Game.UnityGameObject
                         }
 
                         hitBulletLogic.Destroy();
-                        enemyLogic.Destroy(); // TODO: nn74: HP計算 
-                        _enemySpawnerLogic.ActiveEnemies.Remove(enemyLogicNode);
-                        _score += 100; // TODO: nn74: スコア計算
+                        if (enemyLogic.AddDamage())
+                        {
+                            _score += enemyLogic.Score;
+                            enemyLogic.Destroy();
+                            _enemySpawnerLogic.ActiveEnemies.Remove(enemyLogicNode);
+                        }
+                        else
+                        {
+                            _score += enemyLogic.Score / 5;
+                        }
+
                         needPlayHitSe = true;
                     }
 

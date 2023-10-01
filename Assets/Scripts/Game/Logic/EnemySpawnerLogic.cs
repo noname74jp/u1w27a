@@ -75,18 +75,22 @@ namespace Game.Logic
             _frameCounter++;
 
             // 状態を更新
-            _enemies.ForEach(enemyLogic => enemyLogic.UpdateStatus());
+            _enemies.ForEach(enemyLogic => enemyLogic.UpdateStatus(playerLogic));
 
             // 敵の生成を試みる
-            TrySpawnEnemy00(playerLogic, _frameCounter);
+            TrySpawnClub(playerLogic, _frameCounter);
+            TrySpawnDiamond(playerLogic, _frameCounter);
+            TrySpawnHeart(playerLogic, _frameCounter);
+            TrySpawnSpade(playerLogic, _frameCounter);
+            TrySpawnJoker(playerLogic, _frameCounter);
         }
 
         /// <summary>
-        /// <see cref="EnemyLogic.EnemyType.Enemy00" />を生成する。
+        /// <see cref="EnemyLogic.EnemyCategory.Club" />を生成する。
         /// </summary>
         /// <param name="playerLogic">プレイヤーのロジック。</param>
         /// <param name="frameCounter">フレーム数のカウンター。</param>
-        private void TrySpawnEnemy00(PlayerLogic playerLogic, int frameCounter)
+        private void TrySpawnClub(PlayerLogic playerLogic, int frameCounter)
         {
             // 1秒に1回生成
             // TODO: nn74: 仮設定
@@ -100,7 +104,95 @@ namespace Game.Logic
             var x = Random.Range(0, 2) == 0 ? -480.0f : 480.0f;
             var y = Random.Range(-222.0f, 222.0f);
             var location = new Vector2(x, y);
-            enemy.Create(EnemyLogic.EnemyType.Enemy00, location);
+            enemy.Create(EnemyLogic.EnemyType.Club01, location, playerLogic);
+        }
+
+        /// <summary>
+        /// <see cref="EnemyLogic.EnemyCategory.Diamond" />を生成する。
+        /// </summary>
+        /// <param name="playerLogic">プレイヤーのロジック。</param>
+        /// <param name="frameCounter">フレーム数のカウンター。</param>
+        private void TrySpawnDiamond(PlayerLogic playerLogic, int frameCounter)
+        {
+            // 1秒に1回生成
+            // TODO: nn74: 仮設定
+            if (frameCounter % 240 != 0)
+            {
+                return;
+            }
+
+            // 敵を生成
+            var enemy = ActivateEnemy();
+            var x = Random.Range(-440.0f, 440.0f);
+            var y = Random.Range(0, 2) == 0 ? -262.0f : 262.0f;
+            var location = new Vector2(x, y);
+            enemy.Create(EnemyLogic.EnemyType.Diamond01, location, playerLogic);
+        }
+
+        /// <summary>
+        /// <see cref="EnemyLogic.EnemyCategory.Heart" />を生成する。
+        /// </summary>
+        /// <param name="playerLogic">プレイヤーのロジック。</param>
+        /// <param name="frameCounter">フレーム数のカウンター。</param>
+        private void TrySpawnHeart(PlayerLogic playerLogic, int frameCounter)
+        {
+            // 1秒に1回生成
+            // TODO: nn74: 仮設定
+            if (frameCounter % 240 != 0)
+            {
+                return;
+            }
+
+            // 敵を生成
+            var enemy = ActivateEnemy();
+            var x = Random.Range(-440.0f, 440.0f);
+            var y = Random.Range(0, 2) == 0 ? -262.0f : 262.0f;
+            var location = new Vector2(x, y);
+            enemy.Create(EnemyLogic.EnemyType.Heart01, location, playerLogic);
+        }
+
+        /// <summary>
+        /// <see cref="EnemyLogic.EnemyCategory.Spade" />を生成する。
+        /// </summary>
+        /// <param name="playerLogic">プレイヤーのロジック。</param>
+        /// <param name="frameCounter">フレーム数のカウンター。</param>
+        private void TrySpawnSpade(PlayerLogic playerLogic, int frameCounter)
+        {
+            // 1秒に1回生成
+            // TODO: nn74: 仮設定
+            if (frameCounter % 240 != 0)
+            {
+                return;
+            }
+
+            // 敵を生成
+            var enemy = ActivateEnemy();
+            var x = Random.Range(-440.0f, 440.0f);
+            var y = Random.Range(0, 2) == 0 ? -262.0f : 262.0f;
+            var location = new Vector2(x, y);
+            enemy.Create(EnemyLogic.EnemyType.Spade01, location, playerLogic);
+        }
+
+        /// <summary>
+        /// <see cref="EnemyLogic.EnemyCategory.Joker" />を生成する。
+        /// </summary>
+        /// <param name="playerLogic">プレイヤーのロジック。</param>
+        /// <param name="frameCounter">フレーム数のカウンター。</param>
+        private void TrySpawnJoker(PlayerLogic playerLogic, int frameCounter)
+        {
+            // 1秒に1回生成
+            // TODO: nn74: 仮設定
+            if (frameCounter % 240 != 0)
+            {
+                return;
+            }
+
+            // 敵を生成
+            var enemy = ActivateEnemy();
+            var x = Random.Range(-440.0f, 440.0f);
+            var y = Random.Range(0, 2) == 0 ? -262.0f : 262.0f;
+            var location = new Vector2(x, y);
+            enemy.Create(EnemyLogic.EnemyType.Joker, location, playerLogic);
         }
 
         private EnemyLogic ActivateEnemy()
