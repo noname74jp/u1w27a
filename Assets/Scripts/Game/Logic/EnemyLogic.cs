@@ -18,12 +18,17 @@ namespace Game.Logic
         /// <summary>
         /// 敵の種類。
         /// </summary>
-        private EnemyType Type { get; set; }
+        public EnemyType Type { get; private set; }
 
         /// <summary>
         /// 敵のライフ。
         /// </summary>
         private int Life { get; set; }
+
+        /// <summary>
+        /// 敵のダメージカウント。
+        /// </summary>
+        private int DamageCount { get; set; }
 
         /// <summary>
         /// 敵の角度。
@@ -78,7 +83,7 @@ namespace Game.Logic
             /// <summary>
             /// 無効。
             /// </summary>
-            Invalid,
+            Invalid = -1,
 
             /// <summary>
             /// 横方向に直線運動。
@@ -317,7 +322,19 @@ namespace Game.Logic
         public bool AddDamage()
         {
             Life--;
+            DamageCount++;
             return Life <= 0;
+        }
+
+        /// <summary>
+        /// ダメージカウントを取得して0にクリアする。
+        /// </summary>
+        /// <returns>ダメージカウント。</returns>
+        public int GetAndClearDamageCount()
+        {
+            var damageCount = DamageCount;
+            DamageCount = 0;
+            return damageCount;
         }
 
         /// <summary>

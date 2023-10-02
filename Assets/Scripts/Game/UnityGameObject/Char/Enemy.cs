@@ -51,15 +51,24 @@ namespace Game.UnityGameObject.Char
             if (_logic.Alive && !spriteRenderer.enabled)
             {
                 transformCache.localScale = Vector3.one * (_logic.Size * 60.0f / 40.0f);
-                var index = (int)_logic.Category;
-                spriteRenderer.sprite = sprites[index];
-                spriteRenderer.color = colors[index];
+                var spriteIndex = (int)_logic.Category;
+                spriteRenderer.sprite = sprites[spriteIndex];
+                var colorIndex = (int)_logic.Type;
+                spriteRenderer.color = colors[colorIndex];
             }
 
             spriteRenderer.enabled = _logic.Alive;
             if (!_logic.Alive)
             {
                 return;
+            }
+
+            var damageCount = _logic.GetAndClearDamageCount();
+            if (damageCount != 0)
+            {
+                var color = spriteRenderer.color;
+                color = new Color(color.r - 0.1f, color.g - 0.1f, color.b - 0.1f, color.a);
+                spriteRenderer.color = color;
             }
 
             transformCache.localPosition = _logic.Location;
