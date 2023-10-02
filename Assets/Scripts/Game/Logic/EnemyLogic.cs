@@ -76,6 +76,11 @@ namespace Game.Logic
         public enum EnemyType
         {
             /// <summary>
+            /// 無効。
+            /// </summary>
+            Invalid,
+
+            /// <summary>
             /// 横方向に直線運動。
             /// </summary>
             Club00,
@@ -200,7 +205,7 @@ namespace Game.Logic
                     var size = enemyType == EnemyType.Heart00 ? SizeSmall : SizeLarge;
                     base.Create(location, Vector2.zero, size);
                     Category = EnemyCategory.Heart;
-                    Life = enemyType == EnemyType.Heart00 ? 2 : 3;
+                    Life = enemyType == EnemyType.Heart00 ? 1 : 2;
                     Score = 2000;
                     Angle = 0.0f;
                     break;
@@ -213,7 +218,7 @@ namespace Game.Logic
                     var size = enemyType == EnemyType.Spade00 ? SizeSmall : SizeLarge;
                     base.Create(location, velocity, size);
                     Category = EnemyCategory.Spade;
-                    Life = enemyType == EnemyType.Spade00 ? 2 : 3;
+                    Life = enemyType == EnemyType.Spade00 ? 1 : 2;
                     Score = 3000;
                     Angle = GetAngle(velocity);
                     break;
@@ -238,12 +243,13 @@ namespace Game.Logic
         /// </summary>
         /// <param name="player">プレイヤー。</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public void UpdateStatus(PlayerLogic player)
+        /// <returns>破棄が必要ならtrue。</returns>
+        public bool UpdateStatus(PlayerLogic player)
         {
             // 生存していなければ何もしない
             if (!Alive)
             {
-                return;
+                return false;
             }
 
             // カテゴリー別処理
@@ -255,10 +261,10 @@ namespace Game.Logic
                     // 等速直線運動で移動
                     _location += _velocity * (float)Defines.SecondsPerFrame;
 
-                    // 領域外に出たら破棄
+                    // 領域外に出たら破棄養成
                     if (!Rect.Overlaps(Defines.EnemyValidArea))
                     {
-                        Destroy();
+                        return true;
                     }
 
                     break;
@@ -300,6 +306,8 @@ namespace Game.Logic
                 default:
                     throw new ArgumentOutOfRangeException(nameof(Category), Category, null);
             }
+
+            return false;
         }
 
         /// <summary>

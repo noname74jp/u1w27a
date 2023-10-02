@@ -8,6 +8,15 @@ namespace Game.Logic
     /// </summary>
     public class EnemySpawnerLogic
     {
+        #region constants
+
+        /// <summary>
+        /// 敵の生成インターバル[frame]
+        /// </summary>
+        private const int EnemySpawnFrameInterval = (int)(Defines.FramePerSec * 1.25);
+
+        #endregion
+
         #region properties
 
         /// <summary>
@@ -75,14 +84,23 @@ namespace Game.Logic
             _frameCounter++;
 
             // 状態を更新
-            _enemies.ForEach(enemyLogic => enemyLogic.UpdateStatus(playerLogic));
+            _enemies.ForEach(enemyLogic =>
+            {
+                if (enemyLogic.UpdateStatus(playerLogic))
+                {
+                    InactivateEnemy(enemyLogic);
+                }
+            });
 
             // 敵の生成を試みる
-            TrySpawnClub(playerLogic, _frameCounter);
-            TrySpawnDiamond(playerLogic, _frameCounter);
-            TrySpawnHeart(playerLogic, _frameCounter);
-            TrySpawnSpade(playerLogic, _frameCounter);
-            TrySpawnJoker(playerLogic, _frameCounter);
+            if (_frameCounter % EnemySpawnFrameInterval == 0)
+            {
+                TrySpawnClub(playerLogic, _frameCounter);
+                TrySpawnDiamond(playerLogic, _frameCounter);
+                TrySpawnHeart(playerLogic, _frameCounter);
+                TrySpawnSpade(playerLogic, _frameCounter);
+                TrySpawnJoker(playerLogic, _frameCounter);
+            }
         }
 
         /// <summary>
@@ -92,17 +110,36 @@ namespace Game.Logic
         /// <param name="frameCounter">フレーム数のカウンター。</param>
         private void TrySpawnClub(PlayerLogic playerLogic, int frameCounter)
         {
-            // 1秒に1回生成
-            // TODO: nn74: 仮設定
-            if (frameCounter % 240 != 0)
+            var count = frameCounter / EnemySpawnFrameInterval % 8;
+            var type = (frameCounter / EnemySpawnFrameInterval / 8) switch
+            {
+                0 => EnemyLogic.EnemyType.Club00,
+                1 => EnemyLogic.EnemyType.Club00,
+                2 => (count & 0x01) == 0 ? EnemyLogic.EnemyType.Invalid : EnemyLogic.EnemyType.Club00,
+                3 => (count & 0x03) == 0 ? EnemyLogic.EnemyType.Club01 : EnemyLogic.EnemyType.Club00,
+                4 => (count & 0x03) == 0 ? EnemyLogic.EnemyType.Club01 : EnemyLogic.EnemyType.Club00,
+                5 => (count & 0x03) == 0 ? EnemyLogic.EnemyType.Club01 : EnemyLogic.EnemyType.Club00,
+                6 => (count & 0x03) == 0 ? EnemyLogic.EnemyType.Club01 : EnemyLogic.EnemyType.Club00,
+                7 => (count & 0x01) == 0 ? EnemyLogic.EnemyType.Club01 : EnemyLogic.EnemyType.Club00,
+                8 => (count & 0x01) == 0 ? EnemyLogic.EnemyType.Club01 : EnemyLogic.EnemyType.Club00,
+                9 => (count & 0x01) == 0 ? EnemyLogic.EnemyType.Club01 : EnemyLogic.EnemyType.Club00,
+                _ => EnemyLogic.EnemyType.Club01
+            };
+
+            if (type == EnemyLogic.EnemyType.Invalid)
             {
                 return;
             }
 
             // 敵を生成
             var enemy = ActivateEnemy();
+            if (enemy == null)
+            {
+                return;
+            }
+
             var location = GetRandomSpawnLocation(false, true);
-            enemy.Create(EnemyLogic.EnemyType.Club01, location, playerLogic);
+            enemy.Create(type, location, playerLogic);
         }
 
         /// <summary>
@@ -112,17 +149,38 @@ namespace Game.Logic
         /// <param name="frameCounter">フレーム数のカウンター。</param>
         private void TrySpawnDiamond(PlayerLogic playerLogic, int frameCounter)
         {
-            // 1秒に1回生成
-            // TODO: nn74: 仮設定
-            if (frameCounter % 240 != 0)
+            var count = frameCounter / EnemySpawnFrameInterval % 8;
+            var type = (frameCounter / EnemySpawnFrameInterval / 8) switch
+            {
+                0 => EnemyLogic.EnemyType.Invalid,
+                1 => EnemyLogic.EnemyType.Diamond00,
+                2 => (count & 0x01) == 0 ? EnemyLogic.EnemyType.Invalid : EnemyLogic.EnemyType.Diamond00,
+                3 => (count & 0x01) == 0 ? EnemyLogic.EnemyType.Invalid : EnemyLogic.EnemyType.Diamond00,
+                4 => (count & 0x03) == 0 ? EnemyLogic.EnemyType.Diamond01 : EnemyLogic.EnemyType.Diamond00,
+                5 => (count & 0x03) == 0 ? EnemyLogic.EnemyType.Diamond01 : EnemyLogic.EnemyType.Diamond00,
+                6 => (count & 0x03) == 0 ? EnemyLogic.EnemyType.Diamond01 : EnemyLogic.EnemyType.Diamond00,
+                7 => (count & 0x03) == 0 ? EnemyLogic.EnemyType.Diamond01 : EnemyLogic.EnemyType.Diamond00,
+                8 => (count & 0x03) == 0 ? EnemyLogic.EnemyType.Diamond01 : EnemyLogic.EnemyType.Diamond00,
+                9 => (count & 0x01) == 0 ? EnemyLogic.EnemyType.Diamond01 : EnemyLogic.EnemyType.Diamond00,
+                10 => (count & 0x01) == 0 ? EnemyLogic.EnemyType.Diamond01 : EnemyLogic.EnemyType.Diamond00,
+                11 => (count & 0x01) == 0 ? EnemyLogic.EnemyType.Diamond01 : EnemyLogic.EnemyType.Diamond00,
+                _ => EnemyLogic.EnemyType.Diamond01
+            };
+
+            if (type == EnemyLogic.EnemyType.Invalid)
             {
                 return;
             }
 
             // 敵を生成
             var enemy = ActivateEnemy();
+            if (enemy == null)
+            {
+                return;
+            }
+
             var location = GetRandomSpawnLocation(true, false);
-            enemy.Create(EnemyLogic.EnemyType.Diamond01, location, playerLogic);
+            enemy.Create(type, location, playerLogic);
         }
 
         /// <summary>
@@ -132,17 +190,39 @@ namespace Game.Logic
         /// <param name="frameCounter">フレーム数のカウンター。</param>
         private void TrySpawnHeart(PlayerLogic playerLogic, int frameCounter)
         {
-            // 1秒に1回生成
-            // TODO: nn74: 仮設定
-            if (frameCounter % 240 != 0)
+            var count = frameCounter / EnemySpawnFrameInterval % 8;
+            var type = (frameCounter / EnemySpawnFrameInterval / 8) switch
+            {
+                0 => EnemyLogic.EnemyType.Invalid,
+                1 => EnemyLogic.EnemyType.Invalid,
+                2 => EnemyLogic.EnemyType.Heart00,
+                3 => (count & 0x01) == 0 ? EnemyLogic.EnemyType.Invalid : EnemyLogic.EnemyType.Heart00,
+                4 => (count & 0x01) == 0 ? EnemyLogic.EnemyType.Invalid : EnemyLogic.EnemyType.Heart00,
+                5 => (count & 0x03) == 0 ? EnemyLogic.EnemyType.Heart01 : EnemyLogic.EnemyType.Heart00,
+                6 => (count & 0x03) == 0 ? EnemyLogic.EnemyType.Heart01 : EnemyLogic.EnemyType.Heart00,
+                7 => (count & 0x03) == 0 ? EnemyLogic.EnemyType.Heart01 : EnemyLogic.EnemyType.Heart00,
+                8 => (count & 0x03) == 0 ? EnemyLogic.EnemyType.Heart01 : EnemyLogic.EnemyType.Heart00,
+                9 => (count & 0x03) == 0 ? EnemyLogic.EnemyType.Heart01 : EnemyLogic.EnemyType.Heart00,
+                10 => (count & 0x01) == 0 ? EnemyLogic.EnemyType.Heart01 : EnemyLogic.EnemyType.Heart00,
+                11 => (count & 0x01) == 0 ? EnemyLogic.EnemyType.Heart01 : EnemyLogic.EnemyType.Heart00,
+                12 => (count & 0x01) == 0 ? EnemyLogic.EnemyType.Heart01 : EnemyLogic.EnemyType.Heart00,
+                _ => EnemyLogic.EnemyType.Heart01
+            };
+
+            if (type == EnemyLogic.EnemyType.Invalid)
             {
                 return;
             }
 
             // 敵を生成
             var enemy = ActivateEnemy();
+            if (enemy == null)
+            {
+                return;
+            }
+
             var location = GetRandomSpawnLocation(true, true);
-            enemy.Create(EnemyLogic.EnemyType.Heart01, location, playerLogic);
+            enemy.Create(type, location, playerLogic);
         }
 
         /// <summary>
@@ -152,17 +232,41 @@ namespace Game.Logic
         /// <param name="frameCounter">フレーム数のカウンター。</param>
         private void TrySpawnSpade(PlayerLogic playerLogic, int frameCounter)
         {
-            // 1秒に1回生成
-            // TODO: nn74: 仮設定
-            if (frameCounter % 240 != 0)
+            var count = frameCounter / EnemySpawnFrameInterval % 8;
+            var type = (frameCounter / EnemySpawnFrameInterval / 8) switch
+            {
+                0 => EnemyLogic.EnemyType.Invalid,
+                1 => EnemyLogic.EnemyType.Invalid,
+                2 => EnemyLogic.EnemyType.Invalid,
+                3 => (count & 0x07) == 0 ? EnemyLogic.EnemyType.Spade00 : EnemyLogic.EnemyType.Invalid,
+                4 => (count & 0x07) == 0 ? EnemyLogic.EnemyType.Spade00 : EnemyLogic.EnemyType.Invalid,
+                5 => (count & 0x03) == 0 ? EnemyLogic.EnemyType.Spade00 : EnemyLogic.EnemyType.Invalid,
+                6 => (count & 0x03) == 0 ? (count & 0x04) != 0 ? EnemyLogic.EnemyType.Spade00 : EnemyLogic.EnemyType.Spade01 : EnemyLogic.EnemyType.Invalid,
+                7 => (count & 0x03) == 0 ? (count & 0x04) != 0 ? EnemyLogic.EnemyType.Spade00 : EnemyLogic.EnemyType.Spade01 : EnemyLogic.EnemyType.Invalid,
+                8 => (count & 0x03) != 0 ? (count & 0x06) != 0 ? EnemyLogic.EnemyType.Spade00 : EnemyLogic.EnemyType.Spade01 : EnemyLogic.EnemyType.Invalid,
+                9 => (count & 0x03) != 0 ? (count & 0x01) == 0 ? EnemyLogic.EnemyType.Spade00 : EnemyLogic.EnemyType.Spade01 : EnemyLogic.EnemyType.Invalid,
+                10 => (count & 0x03) != 0 ? (count & 0x01) == 0 ? EnemyLogic.EnemyType.Spade00 : EnemyLogic.EnemyType.Spade01 : EnemyLogic.EnemyType.Invalid,
+                11 => (count & 0x03) != 0 ? (count & 0x01) == 0 ? EnemyLogic.EnemyType.Spade00 : EnemyLogic.EnemyType.Spade01 : EnemyLogic.EnemyType.Invalid,
+                12 => (count & 0x01) == 0 ? EnemyLogic.EnemyType.Spade01 : EnemyLogic.EnemyType.Spade00,
+                13 => (count & 0x01) == 0 ? EnemyLogic.EnemyType.Spade01 : EnemyLogic.EnemyType.Spade00,
+                14 => (count & 0x01) == 0 ? EnemyLogic.EnemyType.Spade01 : EnemyLogic.EnemyType.Spade00,
+                _ => EnemyLogic.EnemyType.Spade01
+            };
+
+            if (type == EnemyLogic.EnemyType.Invalid)
             {
                 return;
             }
 
             // 敵を生成
             var enemy = ActivateEnemy();
+            if (enemy == null)
+            {
+                return;
+            }
+
             var location = GetRandomSpawnLocation(true, true);
-            enemy.Create(EnemyLogic.EnemyType.Spade01, location, playerLogic);
+            enemy.Create(type, location, playerLogic);
         }
 
         /// <summary>
@@ -172,17 +276,43 @@ namespace Game.Logic
         /// <param name="frameCounter">フレーム数のカウンター。</param>
         private void TrySpawnJoker(PlayerLogic playerLogic, int frameCounter)
         {
-            // 1秒に1回生成
-            // TODO: nn74: 仮設定
-            if (frameCounter % 240 != 0)
+            var count = frameCounter / EnemySpawnFrameInterval % 8;
+            var type = (frameCounter / EnemySpawnFrameInterval / 8) switch
+            {
+                0 => EnemyLogic.EnemyType.Invalid,
+                1 => EnemyLogic.EnemyType.Invalid,
+                2 => EnemyLogic.EnemyType.Invalid,
+                3 => EnemyLogic.EnemyType.Invalid,
+                4 => EnemyLogic.EnemyType.Invalid,
+                5 => EnemyLogic.EnemyType.Invalid,
+                6 => EnemyLogic.EnemyType.Invalid,
+                7 => EnemyLogic.EnemyType.Invalid,
+                8 => EnemyLogic.EnemyType.Invalid,
+                9 => EnemyLogic.EnemyType.Invalid,
+                10 => EnemyLogic.EnemyType.Invalid,
+                11 => (count & 0x07) == 0 ? EnemyLogic.EnemyType.Joker : EnemyLogic.EnemyType.Invalid,
+                12 => (count & 0x07) == 0 ? EnemyLogic.EnemyType.Joker : EnemyLogic.EnemyType.Invalid,
+                13 => (count & 0x03) == 0 ? EnemyLogic.EnemyType.Joker : EnemyLogic.EnemyType.Invalid,
+                14 => (count & 0x03) == 0 ? EnemyLogic.EnemyType.Joker : EnemyLogic.EnemyType.Invalid,
+                15 => (count & 0x01) == 0 ? EnemyLogic.EnemyType.Joker : EnemyLogic.EnemyType.Invalid,
+                16 => (count & 0x01) == 0 ? EnemyLogic.EnemyType.Joker : EnemyLogic.EnemyType.Invalid,
+                _ => EnemyLogic.EnemyType.Joker
+            };
+
+            if (type == EnemyLogic.EnemyType.Invalid)
             {
                 return;
             }
 
             // 敵を生成
             var enemy = ActivateEnemy();
+            if (enemy == null)
+            {
+                return;
+            }
+
             var location = GetRandomSpawnLocation(true, false);
-            enemy.Create(EnemyLogic.EnemyType.Joker, location, playerLogic);
+            enemy.Create(type, location, playerLogic);
         }
 
         /// <summary>
@@ -219,7 +349,7 @@ namespace Game.Logic
         private EnemyLogic ActivateEnemy()
         {
             // 非アクティブリストの先頭を取得し、nullならnullを返す
-            var enemy = _inactiveEnemies.First.Value;
+            var enemy = _inactiveEnemies.First?.Value;
             if (enemy == null)
             {
                 return null;
@@ -231,6 +361,13 @@ namespace Game.Logic
 
             // 取得したEnemyLogicを返す
             return enemy;
+        }
+
+        public void InactivateEnemy(EnemyLogic enemy)
+        {
+            _inactiveEnemies.AddLast(enemy);
+            _activeEnemies.Remove(enemy);
+            enemy.Destroy();
         }
 
         #endregion

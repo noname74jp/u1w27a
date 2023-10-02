@@ -168,7 +168,7 @@ namespace Game.UnityGameObject
         /// <summary>
         /// 敵数。
         /// </summary>
-        private const int EnemyCount = 512;
+        private const int EnemyCount = 128;
 
         #endregion
 
@@ -524,8 +524,7 @@ namespace Game.UnityGameObject
                         if (enemyLogic.AddDamage())
                         {
                             _score += enemyLogic.Score;
-                            enemyLogic.Destroy();
-                            _enemySpawnerLogic.ActiveEnemies.Remove(enemyLogicNode);
+                            _enemySpawnerLogic.InactivateEnemy(enemyLogic);
                         }
                         else
                         {
