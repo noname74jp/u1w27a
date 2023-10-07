@@ -604,14 +604,18 @@ namespace Game.UnityGameObject
             sound.gameOver.Play();
 
             // メインループ
+            var totalTime = 0.0f;
             while (true)
             {
                 // 入力管理
+                var isDecideKeyPressed = inputActionData.IsDecideKeyPressed();
                 var isRetryKeyPressed = inputActionData.IsRetryKeyPressed();
 
                 // リトライ
-                if (isRetryKeyPressed)
+                totalTime += Time.deltaTime;
+                if (isRetryKeyPressed || (totalTime >= 1.5f && isDecideKeyPressed))
                 {
+                    await UniTask.WaitWhile(() => inputActionData.IsDecideKeyPressed(), cancellationToken: token);
                     UpdateTitle(token).Forget();
                     break;
                 }
