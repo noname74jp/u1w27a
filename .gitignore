@@ -73,6 +73,7 @@ crashlytics-build.properties
 
 
 # User Customs
+/.idea/
 /_Rom/
 /Assets/Arts/Fonts/
 /Assets/Arts/Fonts.meta
